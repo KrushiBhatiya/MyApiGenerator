@@ -26,3 +26,9 @@ exports.projectCollection = async(req , res) => {
     
     res.json({ collections: projectData });
 }
+exports.checkCollection = async(req , res) => {
+    const { projectKey, modelName } = req.query;
+    const exists = await MC.findOne({ "projectKey" : projectKey , "modelName": modelName });
+
+    res.json({ exists: !!exists });
+}

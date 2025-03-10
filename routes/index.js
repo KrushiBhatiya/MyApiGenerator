@@ -8,6 +8,7 @@ router.get('/', IC.indexPage);
 router.get('/modelPage', IC.modelPage);
 router.get('/projectPage', IC.projectPage);
 router.get('/projectCollection', IC.projectCollection);
+router.get('/check-collection', IC.checkCollection);
 router.post('/submit', IC.createModel);
 router.post('/projectsubmit', IC.createProject);
 module.exports = router;

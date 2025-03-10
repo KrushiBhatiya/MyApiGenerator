@@ -272,37 +272,39 @@
     <script>
       const projectToken = sessionStorage.getItem("projectData");
       const TokenData = JSON.parse(projectToken);
-      document
-        .getElementById("typeDropdown")
-        .addEventListener("change", function () {
-          let collectionDropdown =
-            document.getElementById("collectionDropdown");
+      function fetchData() {
+        document
+          .getElementById("typeDropdown")
+          .addEventListener("change", function () {
+            let collectionDropdown =
+              document.getElementById("collectionDropdown");
 
-          if (this.value === "connect") {
-            fetch(`/projectCollection?projectKey=${TokenData.token}`)
-              .then((response) => response.json())
-              .then((data) => {
-                collectionDropdown.innerHTML =
-                  '<option value="" selected disabled>Select Collection</option>';
-                data.collections.forEach((collection) => {
-                  let option = document.createElement("option");
-                  option.value = collection.modelName; // Using modelName as the value
-                  option.textContent = collection.modelName; // Display model name
-                  collectionDropdown.appendChild(option);
-                });
+            if (this.value === "connect") {
+              fetch(`/projectCollection?projectKey=${TokenData.token}`)
+                .then((response) => response.json())
+                .then((data) => {
+                  collectionDropdown.innerHTML =
+                    '<option value="" selected disabled>Select Collection</option>';
+                  data.collections.forEach((collection) => {
+                    let option = document.createElement("option");
+                    option.value = collection.modelName; // Using modelName as the value
+                    option.textContent = collection.modelName; // Display model name
+                    collectionDropdown.appendChild(option);
+                  });
 
-                collectionDropdown.style.display = "block"; // Show dropdown
-              })
-              .catch((error) =>
-                console.error("Error fetching collections:", error)
-              );
-          } else {
-            collectionDropdown.style.display = "none"; // Hide dropdown if another option is selected
-          }
-        });
-
-      // Function to add a new text field, dropdown, and "+" button
-
+                  collectionDropdown.style.display = "block"; // Show dropdown
+                })
+                .catch((error) =>
+                  console.error("Error fetching collections:", error)
+                );
+            } else {
+              collectionDropdown.style.display = "none"; // Hide dropdown if another option is selected
+            }
+          });
+      }
+      fetchData();
+      
+      // Function to generate example of API
       function generateExample(model) {
         const example = {};
         const testId = "67cc2c0961bee872e4b5a974";
@@ -330,12 +332,14 @@
               (_, i) =>
                 `${key}_${i + 1}_${Math.random().toString(36).substring(7)}.png`
             );
-          } else if (type === "connect") {
+          } else if (type.startsWith("connect:")) {
             example[key] = `${testId}`;
           }
         }
         return example;
       }
+
+      // Function to add a new text field, dropdown, and "+" button
       function addFormField() {
         const container = document.createElement("div");
         container.className = "container";
@@ -437,9 +441,8 @@
         return result;
       }
 
-      let stModel = "";
       // Function to gather form data and submit
-      function submitData() {
+      async function submitData() {
         const projectKey = document.getElementById("projectKey").value.trim();
         const modelname = document.getElementById("modelname").value.trim();
         const textFields = document.querySelectorAll('input[name="textField"]');
@@ -479,6 +482,14 @@
         if (!allFieldsFilled) {
           alert("Please Provide valid data before generating the API key.");
           return;
+        }
+
+        const response = await fetch(`/check-collection?projectKey=${projectKey}&modelName=${modelname}`);
+        const checkProjectdata = await response.json();
+
+        if (checkProjectdata.exists) {
+            alert("This collection already exists in the project.");
+            return;
         }
 
         const randomKey = generateRandomKey();
@@ -543,9 +554,12 @@
             document.querySelector('input[name="modelname"]').value = "";
             document.querySelector('input[name="projectKey"]').value = "";
             document.querySelector('select[name="dropdown"]').value = "";
+            document.querySelector('select[name="collection"]').style.display = "none";
           })
           .catch((err) => console.error("Error:", err));
       }
+
+      // Function to display token and example code of API
       function displayData(data) {
         document.getElementById(
           "tokenDisplay"
@@ -558,6 +572,8 @@
         document.getElementById("apiMethodsDisplay").style.padding = "20px";
         document.getElementById("exampleDisplay").style.padding = "20px";
       }
+
+      // window load data get
       window.onload = function () {
         const storedData = sessionStorage.getItem("formData");
         if (storedData) {
@@ -565,6 +581,8 @@
           displayData(data);
         }
       };
+
+      // Function to clear data from session storage and example code
       function clearData() {
         // Remove data from localStorage
         sessionStorage.removeItem("formData");

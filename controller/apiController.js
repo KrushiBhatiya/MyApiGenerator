@@ -2,6 +2,7 @@ const MC = require('../model/index')
 const MD = require('../model/modelData')
 const { parse, isValid: isValidDate } = require('date-fns');
 const cloudinary = require('cloudinary').v2;
+const mongoose = require("mongoose");
 const multer = require('multer');
 cloudinary.config({
     cloud_name: "dgmmsxdaw",
@@ -157,6 +158,13 @@ exports.createData = async (req, res) => {
             if (getType === 'MultiFile') {
                 return dataValue.length > 0;  // Ensure at least one file is uploaded
             }
+            if (typeof getType === "string" && getType.startsWith("connect:")) {
+                if (mongoose.Types.ObjectId.isValid(dataValue)) {
+                    req.body[key] = new mongoose.Types.ObjectId(dataValue); // Convert and store as ObjectId
+                    return true;
+                }
+                return false; // Invalid ObjectId
+            }
             return false
         })
 
@@ -254,32 +262,70 @@ exports.createData = async (req, res) => {
     }
 }
 
-exports.viewData = async (req, res) => {
-    var token = req.headers.authorization
-    var collectionName = req.params.name
-    var validCollection = await MC.findOne({ apiKey: token, modelName: collectionName })
-    try {
-        if (!validCollection) throw new Error("Invalid CollectionName")
-        const data = await MD.find({ apiKey: token })
-        if (data.length === 0) throw new Error("Data not found")
+async function populateFields(modelFieldData, modelFields) {
+    let populatedItem = { ...modelFieldData };
 
-        const withoutApiKeyData = data.map((item) => {
-            const { _id, modelFieldData } = item.toObject();
-            return { _id, ...modelFieldData };
-        });
+    for (const [key, value] of Object.entries(modelFieldData)) {
+        if (typeof modelFields[key] === "string" && modelFields[key].startsWith("connect:")) {
+            const referencedCollection = modelFields[key].split(":")[1]; // Extract collection name
+
+            if (mongoose.Types.ObjectId.isValid(value)) {
+                try {
+                    // Find the correct API key for the referenced collection
+                    const referencedModel = await MC.findOne({ modelName: referencedCollection });
+                    if (!referencedModel) continue; // Skip if no matching model
+                    // Fetch referenced document
+                    const referencedData = await MD.findOne({
+                        _id: value,
+                        apiKey: referencedModel.apiKey,
+                    });
+
+                    if (referencedData) {
+                        // Recursively populate the referenced data
+                        populatedItem[key] = await populateFields(referencedData.modelFieldData, referencedModel.modelField);
+                    }
+                } catch (err) {
+                    console.error(`Error fetching ${referencedCollection}:`, err.message);
+                }
+            }
+        }
+    }
+    return populatedItem;
+}
+
+exports.viewData = async (req, res) => {
+    var token = req.headers.authorization;
+    var collectionName = req.params.name;
+
+    try {
+        // Validate collection
+        const validCollection = await MC.findOne({ apiKey: token, modelName: collectionName });
+        if (!validCollection) throw new Error("Invalid CollectionName");
+
+        // Fetch data from the requested collection
+        const data = await MD.find({ apiKey: token });
+        if (data.length === 0) throw new Error("Data not found");
+
+        // Process data with recursive population
+        const populatedData = await Promise.all(
+            data.map(async (item) => {
+                const { _id, modelFieldData } = item.toObject();
+                return { _id, ...(await populateFields(modelFieldData, validCollection.modelField)) };
+            })
+        );
 
         res.status(200).json({
             Status: "Success",
-            Message: "Record Get SuccessFully",
-            Data: withoutApiKeyData
-        })
+            Message: "Record Get Successfully",
+            Data: populatedData,
+        });
     } catch (error) {
         res.status(404).json({
             Status: "Fail",
             Message: error.message,
-        })
+        });
     }
-}
+};
 
 exports.deleteData = async (req, res) => {
     const deleteId = req.params.id
@@ -439,6 +485,13 @@ exports.editData = async (req, res) => {
             }
             if (getType === 'MultiFile') {
                 return dataValue.length > 0;  // Ensure at least one file is uploaded
+            }
+            if (typeof getType === "string" && getType.startsWith("connect:")) {
+                if (mongoose.Types.ObjectId.isValid(dataValue)) {
+                    req.body[key] = new mongoose.Types.ObjectId(dataValue); // Convert and store as ObjectId
+                    return true;
+                }
+                return false; // Invalid ObjectId
             }
             return false
         })
