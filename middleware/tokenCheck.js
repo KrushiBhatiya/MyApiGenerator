@@ -3,7 +3,9 @@ exports.checkToken = async (req, res, next) => {
     try {
         var token = req.headers.authorization
         if (!token) throw new Error("Attach Token")
-        var tokenData = await MC.findOne({ apiKey: token })
+        var tokenData = await MC.findOne({ projectKey: token })
+        // console.log(tokenData);
+        
         if (!tokenData) throw new Error("Mismatch Token")
         next()
     } catch (error) {

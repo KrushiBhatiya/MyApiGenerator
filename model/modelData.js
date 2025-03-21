@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const modelDataSchema = new mongoose.Schema({
-    apiKey : String,
+    projectKey : String,
+    modelName : String,
     modelFieldData : Object
 })
 module.exports = mongoose.model('modelData',modelDataSchema)

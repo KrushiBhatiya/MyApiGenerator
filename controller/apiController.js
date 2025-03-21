@@ -13,8 +13,8 @@ exports.createData = async (req, res) => {
 
     var token = req.headers.authorization
     var collectionName = req.params.name
-    var validCollection = await MC.findOne({ apiKey: token, modelName: collectionName })
-    var tokenData = await MC.findOne({ apiKey: token })
+    var validCollection = await MC.findOne({ projectKey: token, modelName: collectionName })
+    var tokenData = await MC.findOne({ projectKey: token, modelName: collectionName })
     var checkFieldValue = Object.values(tokenData.modelField)
 
     var preKey = Object.keys(tokenData.modelField)
@@ -207,11 +207,11 @@ exports.createData = async (req, res) => {
                     if (!file.path || file.path.trim() === "") {
                         throw new Error(`File field ${fieldName} is empty. Please upload a file.`);
                     }
-                    console.log("Processing field:", fieldName); // Debugging log
+                    // console.log("Processing field:", fieldName); // Debugging log
 
                     // Determine field type
                     const fieldType = tokenData.modelField[fieldName]; // Get field type
-                    console.log("Field type for", fieldName, "is", fieldType); // Debugging log
+                    // console.log("Field type for", fieldName, "is", fieldType); // Debugging log
 
                     // Upload file to Cloudinary
                     const result = await cloudinary.uploader.upload(file.path, {
@@ -237,7 +237,7 @@ exports.createData = async (req, res) => {
                 }
 
                 // Save database entry with all fields and Cloudinary URLs
-                await MD.create({ apiKey: token, modelFieldData: databaseEntry });
+                await MD.create({ projectKey: token, modelName : collectionName ,modelFieldData: databaseEntry });
                 res.status(200).json({
                     Status: "Success",
                     Message: "Data Enter Success",
@@ -247,7 +247,7 @@ exports.createData = async (req, res) => {
 
         }
         else {
-            await MD.create({ apiKey: token, modelFieldData: req.body })
+            await MD.create({ projectKey: token, modelName : collectionName ,modelFieldData: req.body })
             res.status(200).json({
                 Status: "Success",
                 Message: "Data Enter Success",
@@ -262,7 +262,7 @@ exports.createData = async (req, res) => {
     }
 }
 
-async function populateFields(modelFieldData, modelFields) {
+async function populateFields(token , modelFieldData, modelFields) {
     let populatedItem = { ...modelFieldData };
 
     for (const [key, value] of Object.entries(modelFieldData)) {
@@ -272,17 +272,21 @@ async function populateFields(modelFieldData, modelFields) {
             if (mongoose.Types.ObjectId.isValid(value)) {
                 try {
                     // Find the correct API key for the referenced collection
-                    const referencedModel = await MC.findOne({ modelName: referencedCollection });
+                    const referencedModel = await MC.findOne({projectKey : token, modelName: referencedCollection });
+                    // console.log("referencedModel == ",referencedModel);
+                    
                     if (!referencedModel) continue; // Skip if no matching model
+                    // console.log(" after referencedModel == ",referencedModel);
+
                     // Fetch referenced document
                     const referencedData = await MD.findOne({
                         _id: value,
-                        apiKey: referencedModel.apiKey,
+                        projectKey: referencedModel.projectKey,
                     });
 
                     if (referencedData) {
                         // Recursively populate the referenced data
-                        populatedItem[key] = await populateFields(referencedData.modelFieldData, referencedModel.modelField);
+                        populatedItem[key] = await populateFields(token , referencedData.modelFieldData, referencedModel.modelField);
                     }
                 } catch (err) {
                     console.error(`Error fetching ${referencedCollection}:`, err.message);
@@ -299,18 +303,19 @@ exports.viewData = async (req, res) => {
 
     try {
         // Validate collection
-        const validCollection = await MC.findOne({ apiKey: token, modelName: collectionName });
+        const validCollection = await MC.findOne({ projectKey: token, modelName: collectionName });
         if (!validCollection) throw new Error("Invalid CollectionName");
 
         // Fetch data from the requested collection
-        const data = await MD.find({ apiKey: token });
+        const data = await MD.find({ projectKey: token , modelName: collectionName });
         if (data.length === 0) throw new Error("Data not found");
-
+        // console.log("all data ==> ",data);
+        
         // Process data with recursive population
         const populatedData = await Promise.all(
             data.map(async (item) => {
                 const { _id, modelFieldData } = item.toObject();
-                return { _id, ...(await populateFields(modelFieldData, validCollection.modelField)) };
+                return { _id, ...(await populateFields(token , modelFieldData, validCollection.modelField)) };
             })
         );
 
@@ -331,7 +336,7 @@ exports.deleteData = async (req, res) => {
     const deleteId = req.params.id
     var token = req.headers.authorization
     var collectionName = req.params.name
-    var validCollection = await MC.findOne({ apiKey: token, modelName: collectionName })
+    var validCollection = await MC.findOne({ projectKey: token, modelName: collectionName })
     try {
         if (!validCollection) throw new Error("Invalid CollectionName")
         const deleteData = await MD.findByIdAndDelete(deleteId)
@@ -352,8 +357,8 @@ exports.editData = async (req, res) => {
     const editId = req.params.id
     var token = req.headers.authorization
     var collectionName = req.params.name
-    var validCollection = await MC.findOne({ apiKey: token, modelName: collectionName })
-    var tokenData = await MC.findOne({ apiKey: token })
+    var validCollection = await MC.findOne({ projectKey: token, modelName: collectionName })
+    var tokenData = await MC.findOne({ projectKey: token , modelName: collectionName  })
     var checkFieldValue = Object.values(tokenData.modelField)
     var preKey = Object.keys(tokenData.modelField)
     var postKey = Object.keys(req.body)
@@ -535,11 +540,11 @@ exports.editData = async (req, res) => {
                     if (!file.path || file.path.trim() === "") {
                         throw new Error(`File field ${fieldName} is empty. Please upload a file.`);
                     }
-                    console.log("Processing field:", fieldName); // Debugging log
+                    // console.log("Processing field:", fieldName); // Debugging log
 
                     // Determine field type
                     const fieldType = tokenData.modelField[fieldName]; // Get field type
-                    console.log("Field type for", fieldName, "is", fieldType); // Debugging log
+                    // console.log("Field type for", fieldName, "is", fieldType); // Debugging log
 
                     // Upload file to Cloudinary
                     const result = await cloudinary.uploader.upload(file.path, {

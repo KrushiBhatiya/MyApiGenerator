@@ -492,12 +492,11 @@
             return;
         }
 
-        const randomKey = generateRandomKey();
         const example = generateExample(model);
 
         document.getElementById(
           "tokenDisplay"
-        ).textContent = `Authorization : ${randomKey}`;
+        ).textContent = `Authorization : Enter Your Project Key`;
 
         const apiBaseUrl = `https://generateapi.onrender.com/api/${modelname}`;
         const apiMethods = `
@@ -516,7 +515,6 @@
     `;
 
         const data = {
-          token: randomKey,
           apiMethods,
           exampleOutput,
         };
@@ -531,7 +529,6 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             projectKey: TokenData.token,
-            apiKey: randomKey,
             modelName: modelname,
             modelField: model,
           }),
@@ -563,7 +560,7 @@
       function displayData(data) {
         document.getElementById(
           "tokenDisplay"
-        ).textContent = `Authorization: ${data.token}`;
+        ).textContent = `Authorization : Enter Your Project Key`;
         document.getElementById("apiMethodsDisplay").innerHTML =
           data.apiMethods;
         document.getElementById("exampleDisplay").innerHTML =
