@@ -208,7 +208,7 @@
   </head>
 
   <body>
-    <h1>Create Your Own Field</h1>
+    <h1>Create Your Own Authentication Field</h1>
 
     <input
       type="text"
@@ -221,7 +221,7 @@
     <input
       type="text"
       name="modelname"
-      placeholder="Enter CollectionName"
+      placeholder="Enter Your signup CollectionName"
       id="modelname"
       required
     />
@@ -242,70 +242,32 @@
           <option value="Date">Date</option>
           <option value="SingleFile">File ( Upload Single File )</option>
           <option value="MultiFile">File ( Upload Multiple File )</option>
-          <option value="connect">Connect With other Collection</option>
         </select>
-        <select
-          id="collectionDropdown"
-          name="collection"
-          style="display: none"
-        ></select>
         <button type="button" onclick="removeFormField(this)">-</button>
       </div>
     </div>
 
     <button type="button" onclick="addFormField()">+</button> <br /><br /><br />
     <button id="submitButton" onclick="submitData()">
-      Create Collection And Generate API Key
+      Generate Login Field
     </button>
     <br /><br />
     <button type="button" onclick="clearData()">Clear Data</button>
     <button type="button" style="margin-left: 20px">
-      <a href="/projectPage">Back</a>
+      <a href="/modelPage">Back</a>
     </button>
-    <button type="button" style="margin-left: 20px">
-      <a href="/authPage">Clik here ! To get Authentication API</a>
-    </button>
+    
 
-    <div id="tokenDisplay"></div>
+    <!-- <div id="tokenDisplay"></div>
     <div class="display-container">
       <div id="apiMethodsDisplay"></div>
       <div id="exampleDisplay"></div>
-    </div>
+    </div> -->
 
     <script>
       const projectToken = sessionStorage.getItem("projectData");
       const TokenData = JSON.parse(projectToken);
-      function fetchData() {
-        document
-          .getElementById("typeDropdown")
-          .addEventListener("change", function () {
-            let collectionDropdown =
-              document.getElementById("collectionDropdown");
-
-            if (this.value === "connect") {
-              fetch(`/projectCollection?projectKey=${TokenData.token}`)
-                .then((response) => response.json())
-                .then((data) => {
-                  collectionDropdown.innerHTML =
-                    '<option value="" selected disabled>Select Collection</option>';
-                  data.collections.forEach((collection) => {
-                    let option = document.createElement("option");
-                    option.value = collection.modelName; // Using modelName as the value
-                    option.textContent = collection.modelName; // Display model name
-                    collectionDropdown.appendChild(option);
-                  });
-
-                  collectionDropdown.style.display = "block"; // Show dropdown
-                })
-                .catch((error) =>
-                  console.error("Error fetching collections:", error)
-                );
-            } else {
-              collectionDropdown.style.display = "none"; // Hide dropdown if another option is selected
-            }
-          });
-      }
-      fetchData();
+     
       
       // Function to generate example of API
       function generateExample(model) {
@@ -364,38 +326,7 @@
                 <option value="Date">Date</option>
                 <option value="SingleFile">File ( Upload Single File )</option>
                 <option value="MultiFile">File ( Upload Multiple File )</option>
-                <option value="connect">Connect With other Collection</option>
             `;
-
-        const collectionDropdown = document.createElement("select");
-        collectionDropdown.name = "collection";
-        collectionDropdown.style.display = "none"; // Initially hidden
-
-        // Fetch and populate collection dropdown dynamically
-        select.addEventListener("change", function () {
-          if (this.value === "connect") {
-            fetch(`/projectCollection?projectKey=${TokenData.token}`)
-              .then((response) => response.json())
-              .then((data) => {
-                collectionDropdown.innerHTML =
-                  '<option value="" selected disabled>Select Collection</option>';
-
-                data.collections.forEach((collection) => {
-                  let option = document.createElement("option");
-                  option.value = collection.modelName; // Set value as modelName
-                  option.textContent = collection.modelName; // Display modelName
-                  collectionDropdown.appendChild(option);
-                });
-
-                collectionDropdown.style.display = "block"; // Show dropdown
-              })
-              .catch((error) =>
-                console.error("Error fetching collections:", error)
-              );
-          } else {
-            collectionDropdown.style.display = "none"; // Hide dropdown if another option is selected
-          }
-        });
 
         // Create a "-" button
         const button = document.createElement("button");
@@ -408,7 +339,6 @@
         // Append all elements to the container
         container.appendChild(input);
         container.appendChild(select);
-        container.appendChild(collectionDropdown);
         container.appendChild(button);
 
         // Append the container to the form
@@ -494,46 +424,46 @@
             alert("This collection already exists in the project.");
             return;
         }
+        
+    //     const example = generateExample(model);
 
-        const example = generateExample(model);
+    //     document.getElementById(
+    //       "tokenDisplay"
+    //     ).textContent = `Authorization : Enter Your Project Key`;
 
-        document.getElementById(
-          "tokenDisplay"
-        ).textContent = `Authorization : Enter Your Project Key`;
+    //     const apiBaseUrl = `https://generateapi.onrender.com/api/${modelname}`;
+    //     const apiMethods = `
+    //     <h2>API METHODS</h2>
+    //     <ul>
+    //         <li><strong>POST :</strong> ${apiBaseUrl}</li>
+    //         <li><strong>GET :</strong> ${apiBaseUrl}</li>
+    //         <li><strong>DELETE :</strong> ${apiBaseUrl}/:id</li>
+    //         <li><strong>PATCH :</strong> ${apiBaseUrl}/:id</li>
+    //     </ul>
+    // `;
 
-        const apiBaseUrl = `https://generateapi.onrender.com/api/${modelname}`;
-        const apiMethods = `
-        <h2>API METHODS</h2>
-        <ul>
-            <li><strong>POST :</strong> ${apiBaseUrl}</li>
-            <li><strong>GET :</strong> ${apiBaseUrl}</li>
-            <li><strong>DELETE :</strong> ${apiBaseUrl}/:id</li>
-            <li><strong>PATCH :</strong> ${apiBaseUrl}/:id</li>
-        </ul>
-    `;
+    //     const exampleOutput = `
+    //         <h2>OBJECT EXAMPLE</h2>
+    //     <pre>${JSON.stringify(example, null, 4)}</pre>
+    // `;
 
-        const exampleOutput = `
-            <h2>OBJECT EXAMPLE</h2>
-        <pre>${JSON.stringify(example, null, 4)}</pre>
-    `;
+    //     const data = {
+    //       apiMethods,
+    //       exampleOutput,
+    //     };
+    //     sessionStorage.setItem("formData", JSON.stringify(data));
 
-        const data = {
-          apiMethods,
-          exampleOutput,
-        };
-        sessionStorage.setItem("formData", JSON.stringify(data));
-
-        // Display data on the page
-        displayData(data);
+    //     // Display data on the page
+    //     displayData(data);
 
         // Send data to the server
-        fetch("/submit", {
+        fetch("/authSubmit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             projectKey: TokenData.token,
-            modelName: modelname,
-            modelField: model,
+            authModelName: modelname,
+            authModelFieldData: model,
           }),
         })
           .then((response) => response.json())
