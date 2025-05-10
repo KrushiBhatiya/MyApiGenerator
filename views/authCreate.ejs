@@ -256,7 +256,6 @@
     <button type="button" style="margin-left: 20px">
       <a href="/modelPage">Back</a>
     </button>
-    
 
     <!-- <div id="tokenDisplay"></div>
     <div class="display-container">
@@ -267,8 +266,7 @@
     <script>
       const projectToken = sessionStorage.getItem("projectData");
       const TokenData = JSON.parse(projectToken);
-     
-      
+
       // Function to generate example of API
       function generateExample(model) {
         const example = {};
@@ -417,44 +415,69 @@
           return;
         }
 
-        const response = await fetch(`/check-collection?projectKey=${projectKey}&modelName=${modelname}`);
+        const response = await fetch(
+          `/check-collection?projectKey=${projectKey}&modelName=${modelname}`
+        );
         const checkProjectdata = await response.json();
 
         if (checkProjectdata.exists) {
-            alert("This collection already exists in the project.");
-            return;
+          alert("This collection already exists in the project.");
+          return;
         }
-        
-    //     const example = generateExample(model);
 
-    //     document.getElementById(
-    //       "tokenDisplay"
-    //     ).textContent = `Authorization : Enter Your Project Key`;
+        try {
+          const apiResponse = await fetch("https://your-api-endpoint.com");
+          const data = await apiResponse.json();
 
-    //     const apiBaseUrl = `https://generateapi.onrender.com/api/${modelname}`;
-    //     const apiMethods = `
-    //     <h2>API METHODS</h2>
-    //     <ul>
-    //         <li><strong>POST :</strong> ${apiBaseUrl}</li>
-    //         <li><strong>GET :</strong> ${apiBaseUrl}</li>
-    //         <li><strong>DELETE :</strong> ${apiBaseUrl}/:id</li>
-    //         <li><strong>PATCH :</strong> ${apiBaseUrl}/:id</li>
-    //     </ul>
-    // `;
+          if (data.authModelFieldData) {
+            const fields = Object.keys(data.authModelFieldData);
 
-    //     const exampleOutput = `
-    //         <h2>OBJECT EXAMPLE</h2>
-    //     <pre>${JSON.stringify(example, null, 4)}</pre>
-    // `;
+            const dropdown = document.getElementById("dynamicDropdown");
+            dropdown.innerHTML = '<option value="">Select Field</option>'; // Reset dropdown
 
-    //     const data = {
-    //       apiMethods,
-    //       exampleOutput,
-    //     };
-    //     sessionStorage.setItem("formData", JSON.stringify(data));
+            fields.forEach((field) => {
+              let option = document.createElement("option");
+              option.value = field;
+              option.textContent = field;
+              dropdown.appendChild(option);
+            });
+          } else {
+            console.error("authModelFieldData not found in API response.");
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
 
-    //     // Display data on the page
-    //     displayData(data);
+        //     const example = generateExample(model);
+
+        //     document.getElementById(
+        //       "tokenDisplay"
+        //     ).textContent = `Authorization : Enter Your Project Key`;
+
+        //     const apiBaseUrl = `https://generateapi.onrender.com/api/${modelname}`;
+        //     const apiMethods = `
+        //     <h2>API METHODS</h2>
+        //     <ul>
+        //         <li><strong>POST :</strong> ${apiBaseUrl}</li>
+        //         <li><strong>GET :</strong> ${apiBaseUrl}</li>
+        //         <li><strong>DELETE :</strong> ${apiBaseUrl}/:id</li>
+        //         <li><strong>PATCH :</strong> ${apiBaseUrl}/:id</li>
+        //     </ul>
+        // `;
+
+        //     const exampleOutput = `
+        //         <h2>OBJECT EXAMPLE</h2>
+        //     <pre>${JSON.stringify(example, null, 4)}</pre>
+        // `;
+
+        //     const data = {
+        //       apiMethods,
+        //       exampleOutput,
+        //     };
+        //     sessionStorage.setItem("formData", JSON.stringify(data));
+
+        //     // Display data on the page
+        //     displayData(data);
 
         // Send data to the server
         fetch("/authSubmit", {
@@ -484,7 +507,8 @@
             document.querySelector('input[name="modelname"]').value = "";
             document.querySelector('input[name="projectKey"]').value = "";
             document.querySelector('select[name="dropdown"]').value = "";
-            document.querySelector('select[name="collection"]').style.display = "none";
+            document.querySelector('select[name="collection"]').style.display =
+              "none";
           })
           .catch((err) => console.error("Error:", err));
       }
