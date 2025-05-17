@@ -97,8 +97,7 @@
       }
 
       /* API Methods and token display styling */
-      #apiMethodsDisplay,
-      #exampleDisplay {
+      #apiMethodsDisplay {
         margin-top: 20px;
         font-size: 16px;
         line-height: 1.6;
@@ -112,11 +111,32 @@
         text-align: center;
         background: linear-gradient(to right, #00c6ff, #0072ff);
         border-radius: 10px;
-        width: 80%;
+        width: 40%;
         max-width: 525px;
         box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
       }
-
+      #exampleDisplay {
+        display: flex;
+        margin-top: 20px;
+        font-size: 16px;
+        line-height: 1.6;
+        text-align: left;
+        margin-bottom: 20px;
+        color: #fff;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        text-align: center;
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+        border-radius: 10px;
+        width: 50%;
+        max-width: 570px;
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+      }
+      #first,
+      #second {
+        width: 50%;
+      }
       #apiMethodsDisplay ul {
         list-style-type: none;
         padding-left: 0;
@@ -155,7 +175,6 @@
         /* Space between title and content */
         text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
       }
-
       .display-container {
         display: flex;
         justify-content: space-evenly;
@@ -208,332 +227,73 @@
   </head>
 
   <body>
-    <h1>Create Your Own Authentication Field</h1>
+    <h1>Your Authentication API</h1>
 
-    <input
-      type="text"
-      name="projectKey"
-      placeholder="Enter projectKey"
-      id="projectKey"
-      required
-    />
-    <br /><br />
-    <input
-      type="text"
-      name="modelname"
-      placeholder="Enter Your signup CollectionName"
-      id="modelname"
-      required
-    />
-    <!-- <br><br> -->
-    <div id="formContainer">
-      <div class="container">
-        <input
-          type="text"
-          placeholder="Enter FieldName"
-          name="textField"
-          required
-        />
-        <select id="typeDropdown" name="dropdown" required>
-          <option value="" selected disabled>SELECT TYPE</option>
-          <option value="String">Text</option>
-          <option value="Number">Number</option>
-          <option value="Boolean">Boolean</option>
-          <option value="Date">Date</option>
-          <option value="SingleFile">File ( Upload Single File )</option>
-          <option value="MultiFile">File ( Upload Multiple File )</option>
-        </select>
-        <button type="button" onclick="removeFormField(this)">-</button>
+    <div id="tokenDisplay"></div>
+    <div class="display-container">
+      <div id="apiMethodsDisplay"></div>
+      <div id="exampleDisplay">
+        <div id="first" class="">hello</div>
+        <div id="second">hello1</div>
       </div>
     </div>
 
-    <button type="button" onclick="addFormField()">+</button> <br /><br /><br />
-    <button id="submitButton" onclick="submitData()">
-      Generate Login Field
-    </button>
-    <br /><br />
-    <button type="button" onclick="clearData()">Clear Data</button>
     <button type="button" style="margin-left: 20px">
       <a href="/modelPage">Back</a>
     </button>
-
-    <!-- <div id="tokenDisplay"></div>
-    <div class="display-container">
-      <div id="apiMethodsDisplay"></div>
-      <div id="exampleDisplay"></div>
-    </div> -->
 
     <script>
       const projectToken = sessionStorage.getItem("projectData");
       const TokenData = JSON.parse(projectToken);
 
-      // Function to generate example of API
-      function generateExample(model) {
-        const example = {};
-        const testId = "67cc2c0961bee872e4b5a974";
-        for (const [key, type] of Object.entries(model)) {
-          if (type === "String") {
-            example[key] = "Sample Text"; // Example string
-          } else if (type === "Boolean") {
-            example[key] = Math.random() > 0.5; // Random true/false
-          } else if (type === "Number") {
-            example[key] = Math.floor(Math.random() * 100000); // Random number
-          } else if (type === "Date") {
-            const randomDate = new Date();
-            randomDate.setDate(
-              randomDate.getDate() - Math.floor(Math.random() * 1000)
-            ); // Random past date
-            example[key] = randomDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-          } else if (type === "SingleFile") {
-            example[key] = `${key}_${Math.random()
-              .toString(36)
-              .substring(7)}.png`; // Random file path
-          } else if (type === "MultiFile") {
-            const fileCount = Math.floor(Math.random() * 5) + 1; // 1 to 5 files
-            example[key] = Array.from(
-              { length: fileCount },
-              (_, i) =>
-                `${key}_${i + 1}_${Math.random().toString(36).substring(7)}.png`
-            );
-          } else if (type.startsWith("connect:")) {
-            example[key] = `${testId}`;
-          }
-        }
-        return example;
-      }
-
-      // Function to add a new text field, dropdown, and "+" button
-      function addFormField() {
-        const container = document.createElement("div");
-        container.className = "container";
-
-        // Create a text input
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = "Enter text";
-        input.name = "textField";
-
-        // Create a dropdown
-        const select = document.createElement("select");
-        select.name = "dropdown";
-        select.innerHTML = `
-                <option value="" selected disabled>SELECT OPTION</option>
-                <option value="String">Text</option>
-                <option value="Number">Number</option>
-                <option value="Boolean">Boolean</option>
-                <option value="Date">Date</option>
-                <option value="SingleFile">File ( Upload Single File )</option>
-                <option value="MultiFile">File ( Upload Multiple File )</option>
-            `;
-
-        // Create a "-" button
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = "-";
-        button.onclick = function () {
-          removeFormField(this);
-        };
-
-        // Append all elements to the container
-        container.appendChild(input);
-        container.appendChild(select);
-        container.appendChild(button);
-
-        // Append the container to the form
-        document.getElementById("formContainer").appendChild(container);
-      }
-
-      // Function to remove a specific row (container)
-      function removeFormField(button) {
-        const container = button.parentElement;
-        const formContainer = document.getElementById("formContainer");
-
-        // Check if the container is the first child
-        if (container === formContainer.firstElementChild) {
-          alert("The first row cannot be removed.");
-          return;
-        }
-
-        // Remove the container
-        container.remove();
-      }
-
-      // Function to generate a random key (token)
-      function generateRandomKey() {
-        const characters =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = "";
-        const length = 16; // Length of the random key
-        for (let i = 0; i < length; i++) {
-          result += characters.charAt(
-            Math.floor(Math.random() * characters.length)
-          );
-        }
-        return result;
-      }
-
-      // Function to gather form data and submit
-      async function submitData() {
-        const projectKey = document.getElementById("projectKey").value.trim();
-        const modelname = document.getElementById("modelname").value.trim();
-        const textFields = document.querySelectorAll('input[name="textField"]');
-        const dropdowns = document.querySelectorAll('select[name="dropdown"]');
-        const collectionDropdowns = document.querySelectorAll(
-          'select[name="collection"]'
-        );
-
-        const model = {};
-        let allFieldsFilled = true;
-
-        if (
-          modelname.includes(" ") ||
-          projectKey.includes(" ") ||
-          projectKey != TokenData.token
-        ) {
-          allFieldsFilled = false;
-        }
-
-        textFields.forEach((textField, index) => {
-          const textValue = textField.value.trim();
-          const dropdownValue = dropdowns[index].value;
-          //   alert(dropdownValue);
-          if (!textValue || !dropdownValue || textValue.includes(" ")) {
-            allFieldsFilled = false;
-          } else {
-            if (dropdownValue === "connect") {
-              const collectionValue =
-                collectionDropdowns[index]?.value || "Unknown Collection";
-              model[textValue] = `connect:${collectionValue}`;
-            } else {
-              model[textValue] = dropdownValue;
-            }
-          }
-        });
-
-        if (!allFieldsFilled) {
-          alert("Please Provide valid data before generating the API key.");
-          return;
-        }
-
-        const response = await fetch(
-          `/check-collection?projectKey=${projectKey}&modelName=${modelname}`
-        );
-        const checkProjectdata = await response.json();
-
-        if (checkProjectdata.exists) {
-          alert("This collection already exists in the project.");
-          return;
-        }
-
-        try {
-          const apiResponse = await fetch("https://your-api-endpoint.com");
-          const data = await apiResponse.json();
-
-          if (data.authModelFieldData) {
-            const fields = Object.keys(data.authModelFieldData);
-
-            const dropdown = document.getElementById("dynamicDropdown");
-            dropdown.innerHTML = '<option value="">Select Field</option>'; // Reset dropdown
-
-            fields.forEach((field) => {
-              let option = document.createElement("option");
-              option.value = field;
-              option.textContent = field;
-              dropdown.appendChild(option);
-            });
-          } else {
-            console.error("authModelFieldData not found in API response.");
-          }
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-
-        //     const example = generateExample(model);
-
-        //     document.getElementById(
-        //       "tokenDisplay"
-        //     ).textContent = `Authorization : Enter Your Project Key`;
-
-        //     const apiBaseUrl = `https://generateapi.onrender.com/api/${modelname}`;
-        //     const apiMethods = `
-        //     <h2>API METHODS</h2>
-        //     <ul>
-        //         <li><strong>POST :</strong> ${apiBaseUrl}</li>
-        //         <li><strong>GET :</strong> ${apiBaseUrl}</li>
-        //         <li><strong>DELETE :</strong> ${apiBaseUrl}/:id</li>
-        //         <li><strong>PATCH :</strong> ${apiBaseUrl}/:id</li>
-        //     </ul>
-        // `;
-
-        //     const exampleOutput = `
-        //         <h2>OBJECT EXAMPLE</h2>
-        //     <pre>${JSON.stringify(example, null, 4)}</pre>
-        // `;
-
-        //     const data = {
-        //       apiMethods,
-        //       exampleOutput,
-        //     };
-        //     sessionStorage.setItem("formData", JSON.stringify(data));
-
-        //     // Display data on the page
-        //     displayData(data);
-
-        // Send data to the server
-        fetch("/authSubmit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            projectKey: TokenData.token,
-            authModelName: modelname,
-            authModelFieldData: model,
-          }),
-        })
-          .then((response) => response.json())
-          .then(() => {
-            // Clear all dynamic rows except the first default row
-            const formContainer = document.getElementById("formContainer");
-            // Remove all rows except the first one
-            const rows = formContainer.querySelectorAll(".container");
-            rows.forEach((row, index) => {
-              if (index !== 0) {
-                // Keep the first row
-                row.remove();
-              }
-            });
-
-            // Clear text fields and dropdowns in the first row
-            document.querySelector('input[name="textField"]').value = "";
-            document.querySelector('input[name="modelname"]').value = "";
-            document.querySelector('input[name="projectKey"]').value = "";
-            document.querySelector('select[name="dropdown"]').value = "";
-            document.querySelector('select[name="collection"]').style.display =
-              "none";
-          })
-          .catch((err) => console.error("Error:", err));
-      }
-
       // Function to display token and example code of API
       function displayData(data) {
-        document.getElementById(
-          "tokenDisplay"
-        ).textContent = `Authorization : Enter Your Project Key`;
         document.getElementById("apiMethodsDisplay").innerHTML =
           data.apiMethods;
-        document.getElementById("exampleDisplay").innerHTML =
-          data.exampleOutput;
-
+        document.getElementById("first").innerHTML = data.exampleOutput;
+        document.getElementById("second").innerHTML = data.exampleOutput1;
         document.getElementById("apiMethodsDisplay").style.padding = "20px";
         document.getElementById("exampleDisplay").style.padding = "20px";
       }
 
       // window load data get
       window.onload = function () {
-        const storedData = sessionStorage.getItem("formData");
-        if (storedData) {
-          const data = JSON.parse(storedData);
-          displayData(data);
+        const apiMethods = `
+        <h2>API METHODS</h2>
+        <ul>
+            <li><strong>POST :</strong> https://generateapi.onrender.com/auth/signUp</li>
+            <li><strong>POST :</strong> https://generateapi.onrender.com/auth/login</li>
+            
+        </ul>
+    `;
+
+        const exampleOutput = `<h2>SignUp</h2> 
+    
+    <pre>
+        {
+            "name" : "test",
+            "email" : "test@gmail.com",
+            "password" : "test"
         }
+    </pre>
+    
+      
+    `;
+    const exampleOutput1 = `<h2>Login</h2> 
+    
+    <pre>
+        {
+            "email" : "test@gmail.com",
+            "password" : "test"
+        }
+    </pre>
+    
+      
+    `;
+
+        const data = { apiMethods, exampleOutput , exampleOutput1 };
+
+        displayData(data);
       };
 
       // Function to clear data from session storage and example code

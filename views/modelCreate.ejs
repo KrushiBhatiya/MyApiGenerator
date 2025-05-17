@@ -262,9 +262,9 @@
     <button type="button" style="margin-left: 20px">
       <a href="/projectPage">Back</a>
     </button>
-    <!-- <button type="button" style="margin-left: 20px">
+    <button type="button" id="authButton" style="margin-left: 20px; display: none">
       <a href="/authPage">Clik here ! To get Authentication API</a>
-    </button> -->
+    </button>
 
     <div id="tokenDisplay"></div>
     <div class="display-container">
@@ -273,6 +273,12 @@
     </div>
 
     <script>
+      const authCheck = localStorage.getItem("authCheck");
+
+      if (authCheck === "true") {
+        document.getElementById('authButton').style.display = "inline-block"
+      }
+
       const projectToken = sessionStorage.getItem("projectData");
       const TokenData = JSON.parse(projectToken);
       function fetchData() {
@@ -306,7 +312,7 @@
           });
       }
       fetchData();
-      
+
       // Function to generate example of API
       function generateExample(model) {
         const example = {};
@@ -487,12 +493,14 @@
           return;
         }
 
-        const response = await fetch(`/check-collection?projectKey=${projectKey}&modelName=${modelname}`);
+        const response = await fetch(
+          `/check-collection?projectKey=${projectKey}&modelName=${modelname}`
+        );
         const checkProjectdata = await response.json();
 
         if (checkProjectdata.exists) {
-            alert("This collection already exists in the project.");
-            return;
+          alert("This collection already exists in the project.");
+          return;
         }
 
         const example = generateExample(model);
@@ -554,7 +562,8 @@
             document.querySelector('input[name="modelname"]').value = "";
             document.querySelector('input[name="projectKey"]').value = "";
             document.querySelector('select[name="dropdown"]').value = "";
-            document.querySelector('select[name="collection"]').style.display = "none";
+            document.querySelector('select[name="collection"]').style.display =
+              "none";
           })
           .catch((err) => console.error("Error:", err));
       }

@@ -5,23 +5,24 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose')
 var cors = require('cors')
-mongoose.connect('mongodb+srv://admin:admin@cluster0.w16vr.mongodb.net/generateapi?retryWrites=true&w=majority&appName=Cluster0', { useNewUrlParser: true, useUnifiedTopology: true, bufferCommands: false })
-.then(() => {
-  console.log("success");
-})
-.catch((error) => {
-  console.log(error.message);
-})
-// mongoose.connect('mongodb://localhost:27017/generateapi')
+// mongoose.connect('mongodb+srv://admin:admin@cluster0.w16vr.mongodb.net/generateapi?retryWrites=true&w=majority&appName=Cluster0', { useNewUrlParser: true, useUnifiedTopology: true, bufferCommands: false })
 // .then(() => {
 //   console.log("success");
 // })
 // .catch((error) => {
 //   console.log(error.message);
 // })
+mongoose.connect('mongodb://localhost:27017/generateapi')
+.then(() => {
+  console.log("success");
+})
+.catch((error) => {
+  console.log(error.message);
+})
 mongoose.set('bufferTimeoutMS', 20000);
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api')
+var authRouter = require('./routes/auth')
 
 var app = express();
 
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
+app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
