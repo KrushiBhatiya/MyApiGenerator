@@ -1,6 +1,5 @@
 const MC = require('../model/index')
 const PC = require('../model/projectData')
-const AC = require('../model/authData')
 exports.indexPage = function (req, res, next) {
     res.render('index');
 }
@@ -42,11 +41,11 @@ exports.checkCollection = async(req , res) => {
 }
 exports.checkAuthCollection = async(req , res) => {
     const { projectKey, authModelName } = req.query;
-    const exists = await AC.findOne({ "projectKey" : projectKey , "authModelName": authModelName });
+    const exists = await MC.findOne({ "projectKey" : projectKey , "modelName": authModelName });
 
     res.json({ exists: !!exists });
 }
 exports.authApiGenerate = async(req , res) => {
-    await AC.create(req.body)
+    await MC.create(req.body)
     res.json({ status: 'success'});
 }

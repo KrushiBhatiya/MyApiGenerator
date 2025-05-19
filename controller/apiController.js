@@ -1,8 +1,6 @@
 const MC = require("../model/index");
 const MD = require("../model/modelData");
-const AMD = require("../model/authData");
 const PD = require("../model/projectData")
-const authCreate = require("../model/authModelData");
 const { parse, isValid: isValidDate } = require("date-fns");
 const cloudinary = require("cloudinary").v2;
 const mongoose = require("mongoose");
@@ -18,7 +16,7 @@ exports.authDataCheck = async (req, res) => {
   var { email, password } = req.body;
 
   try {
-    var authData = await authCreate.findOne({
+    var authData = await MD.findOne({
       projectKey: token,
       modelName: "signUp",
       "modelFieldData.email": email,
@@ -26,9 +24,16 @@ exports.authDataCheck = async (req, res) => {
     });
 
     if (!authData) throw new Error("Invalid User");
+
+    const flattenedData = {
+    _id: authData._id,
+    ...authData.modelFieldData,
+    __v: authData.__v
+};
     res.status(200).json({
       Status: "Success",
       Message: "User login Success",
+      data : flattenedData
     });
   } catch (error) {
     res.status(404).json({
@@ -40,19 +45,22 @@ exports.authDataCheck = async (req, res) => {
 
 exports.authCreateData = async (req, res) => {
   var token = req.headers.authorization;
-  console.log("====");
+  // console.log("====");
   
   try {
 
-  var tokenData = await AMD.findOne({
+  var tokenData = await MC.findOne({
     projectKey: token,
-    authModelName: "signUp",
+    modelName: "signUp",
   });
 
-  if(!tokenData) throw new Error("Invalid")
+  // console.log("tokenData ==> ",tokenData);
+  
 
-  var preKey = Object.keys(tokenData.authModelFieldData);
-  console.log("preKey ==> ", preKey);
+  // if(!tokenData) throw new Error("Invalid")
+
+  var preKey = Object.keys(tokenData.modelField);
+  // console.log("preKey ==> ", preKey);
 
   var postKey = Object.keys(req.body);
 
@@ -65,9 +73,9 @@ exports.authCreateData = async (req, res) => {
     }
 
     const isValid = preKey.every((key, index) => {
-      console.log("key ==> ==> ", key);
+      // console.log("key ==> ==> ", key);
 
-      const getType = tokenData.authModelFieldData[key];
+      const getType = tokenData.modelField[key];
       let dataValue = req.body[key];
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       console.log("==>", dataValue);
@@ -90,7 +98,7 @@ exports.authCreateData = async (req, res) => {
     }));
 
     // Combine with other fixed conditions
-    const findData = await authCreate.findOne({
+    const findData = await MD.findOne({
       projectKey: token,
       modelName: "signUp",
       $or: fieldConditions,
@@ -98,7 +106,7 @@ exports.authCreateData = async (req, res) => {
 
     if (findData) throw new Error("Already User Exist!!");
 
-    await authCreate.create({
+    await MD.create({
       projectKey: token,
       modelName: "signUp",
       modelFieldData: req.body,
@@ -412,7 +420,6 @@ exports.createData = async (req, res) => {
     });
   }
 };
-
 async function populateFields(token, modelFieldData, modelFields) {
   let populatedItem = { ...modelFieldData };
 
@@ -457,7 +464,6 @@ async function populateFields(token, modelFieldData, modelFields) {
   }
   return populatedItem;
 }
-
 exports.viewData = async (req, res) => {
   var token = req.headers.authorization;
   var collectionName = req.params.name;
@@ -505,7 +511,6 @@ exports.viewData = async (req, res) => {
     });
   }
 };
-
 exports.deleteData = async (req, res) => {
   const deleteId = req.params.id;
   var token = req.headers.authorization;
@@ -529,7 +534,6 @@ exports.deleteData = async (req, res) => {
     });
   }
 };
-
 exports.editData = async (req, res) => {
   const editId = req.params.id;
   var token = req.headers.authorization;

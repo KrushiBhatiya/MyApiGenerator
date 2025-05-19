@@ -279,6 +279,7 @@
 
           if (!checkProjectName.exists) {
             alert("Invalid Project Key.");
+            document.getElementById("projectName").value = "";
             return;
           }
 
@@ -331,8 +332,8 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               projectKey: projectKey,
-              authModelName: "signUp",
-              authModelFieldData: {
+              modelName: "signUp",
+              modelField: {
                 name: "String",
                 email: "Email",
                 password: "String",
@@ -350,6 +351,8 @@
 
       // Function to display token and example code of API
       function displayData(data) {
+        console.log(data);
+        
         document.getElementById("apiMethodsDisplay").innerHTML =
           data.apiMethods;
         document.getElementById("first").innerHTML = data.exampleOutput;
