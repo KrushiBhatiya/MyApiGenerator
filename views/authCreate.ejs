@@ -130,7 +130,7 @@
         background: linear-gradient(to right, #00c6ff, #0072ff);
         border-radius: 10px;
         width: 50%;
-        max-width: 570px;
+        max-width: 590px;
         box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
       }
       #first,
@@ -229,22 +229,124 @@
   <body>
     <h1>Your Authentication API</h1>
 
+    <input
+      type="text"
+      name="projectName"
+      placeholder="Enter ProjectName"
+      id="projectName"
+      required
+    /><button
+      id="submitButton"
+      onclick="submitData()"
+      style="margin-left: 25px"
+    >
+      Submit
+    </button>
+
     <div id="tokenDisplay"></div>
     <div class="display-container">
       <div id="apiMethodsDisplay"></div>
       <div id="exampleDisplay">
-        <div id="first" class="">hello</div>
-        <div id="second">hello1</div>
+        <div id="first"></div>
+        <div id="second"></div>
       </div>
     </div>
-
+    <button type="button" onclick="clearData()">Clear Data</button>
     <button type="button" style="margin-left: 20px">
       <a href="/modelPage">Back</a>
     </button>
 
     <script>
-      const projectToken = sessionStorage.getItem("projectData");
-      const TokenData = JSON.parse(projectToken);
+      async function submitData() {
+        const projectKey = document.getElementById("projectName").value.trim();
+        // alert(projectKey)
+        let allFieldsFilled = true;
+
+        if (projectKey.includes(" ") || projectKey == "") {
+          allFieldsFilled = false;
+        }
+
+        if (!allFieldsFilled) {
+          alert("Please Provide valid data before generating Auth API.");
+          return;
+        }
+        try {
+          const projectCheck = await fetch(
+            `/check-projectName?projectKey=${projectKey}`
+          );
+          const checkProjectName = await projectCheck.json();
+          // console.log("checkProjectName ==> ",checkProjectName);
+
+          if (!checkProjectName.exists) {
+            alert("Invalid Project Key.");
+            return;
+          }
+
+          const response = await fetch(
+            `/check-authCollection?projectKey=${projectKey}&authModelName=signUp`
+          );
+          const checkProjectdata = await response.json();
+
+          if (checkProjectdata.exists) {
+            alert("This Auth API already exists in the project.");
+            document.getElementById("projectName").value = "";
+            return;
+          }
+
+          const apiMethods = `
+          <h2>API METHODS</h2>
+          <ul>
+              <li><strong>POST :</strong> https://generateapi.onrender.com/auth/signUp</li>
+              <li><strong>POST :</strong> https://generateapi.onrender.com/auth/login</li>
+
+          </ul>
+      `;
+
+          const ex = {
+            name: "test",
+            email: "test@gmail.com",
+            password: "test",
+          };
+
+          const exampleOutput = `<h2>SignUp</h2>
+
+      <pre>${JSON.stringify(ex, null, 4)}</pre>
+
+      `;
+
+          const ex1 = { email: "test@gmail.com", password: "test" };
+
+          const exampleOutput1 = `<h2>Login</h2>
+
+      <pre>${JSON.stringify(ex1, null, 4)}</pre>
+
+      `;
+
+          const dataSt = { apiMethods, exampleOutput, exampleOutput1 };
+          
+          sessionStorage.setItem("authData", JSON.stringify(dataSt));
+
+          fetch("/authApiGenerate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              projectKey: projectKey,
+              authModelName: "signUp",
+              authModelFieldData: {
+                name: "String",
+                email: "Email",
+                password: "String",
+              },
+            }),
+          })
+            .then((response) => response.json())
+            .catch((err) => console.error("Error:", err));
+          document.getElementById("projectName").value = "";
+          displayData(dataSt);
+        } catch (error) {
+          console.log(error);
+        }
+      }
 
       // Function to display token and example code of API
       function displayData(data) {
@@ -256,73 +358,27 @@
         document.getElementById("exampleDisplay").style.padding = "20px";
       }
 
-      // window load data get
-      window.onload = function () {
-        const apiMethods = `
-        <h2>API METHODS</h2>
-        <ul>
-            <li><strong>POST :</strong> https://generateapi.onrender.com/auth/signUp</li>
-            <li><strong>POST :</strong> https://generateapi.onrender.com/auth/login</li>
-            
-        </ul>
-    `;
-
-        const exampleOutput = `<h2>SignUp</h2> 
-    
-    <pre>
-        {
-            "name" : "test",
-            "email" : "test@gmail.com",
-            "password" : "test"
-        }
-    </pre>
-    
-      
-    `;
-    const exampleOutput1 = `<h2>Login</h2> 
-    
-    <pre>
-        {
-            "email" : "test@gmail.com",
-            "password" : "test"
-        }
-    </pre>
-    
-      
-    `;
-
-        const data = { apiMethods, exampleOutput , exampleOutput1 };
-
-        displayData(data);
-      };
-
-      // Function to clear data from session storage and example code
       function clearData() {
         // Remove data from localStorage
-        sessionStorage.removeItem("formData");
+        sessionStorage.removeItem("authData");
 
         // Clear the displayed data
-        document.getElementById("tokenDisplay").textContent = "";
         document.getElementById("apiMethodsDisplay").innerHTML = "";
         document.getElementById("exampleDisplay").innerHTML = "";
         document.getElementById("apiMethodsDisplay").style.padding = "0px";
         document.getElementById("exampleDisplay").style.padding = "0px";
-
-        const formContainer = document.getElementById("formContainer");
-        // Remove all rows except the first one
-        const rows = formContainer.querySelectorAll(".container");
-        rows.forEach((row, index) => {
-          if (index !== 0) {
-            // Keep the first row
-            row.remove();
-          }
-        });
-
-        document.querySelector('input[name="textField"]').value = "";
-        document.querySelector('input[name="modelname"]').value = "";
-        document.querySelector('input[name="projectKey"]').value = "";
-        document.querySelector('select[name="dropdown"]').value = "";
       }
+
+      // window load data get
+      window.onload = function () {
+        const storedData = sessionStorage.getItem("authData");
+        if (storedData) {
+          data = JSON.parse(storedData);
+          displayData(data);
+        }
+      };
+
+      // Function to clear data from session storage and example code
     </script>
   </body>
 </html>

@@ -1,6 +1,7 @@
 const MC = require("../model/index");
 const MD = require("../model/modelData");
 const AMD = require("../model/authData");
+const PD = require("../model/projectData")
 const authCreate = require("../model/authModelData");
 const { parse, isValid: isValidDate } = require("date-fns");
 const cloudinary = require("cloudinary").v2;
@@ -15,42 +16,47 @@ cloudinary.config({
 exports.authDataCheck = async (req, res) => {
   var token = req.headers.authorization;
   var { email, password } = req.body;
-  
+
   try {
     var authData = await authCreate.findOne({
-    projectKey: token,
-    modelName: "signUp",
-    "modelFieldData.email": email,
-    "modelFieldData.password": password,
-  });
+      projectKey: token,
+      modelName: "signUp",
+      "modelFieldData.email": email,
+      "modelFieldData.password": password,
+    });
 
-  if(!authData) throw new Error("Invalid User")
+    if (!authData) throw new Error("Invalid User");
     res.status(200).json({
       Status: "Success",
-      Message: "User login Success"
-    })
+      Message: "User login Success",
+    });
   } catch (error) {
-         res.status(404).json({
+    res.status(404).json({
       Status: "Fail",
       Message: error.message,
     });
   }
-
 };
 
 exports.authCreateData = async (req, res) => {
   var token = req.headers.authorization;
+  console.log("====");
+  
+  try {
+
   var tokenData = await AMD.findOne({
     projectKey: token,
     authModelName: "signUp",
   });
+
+  if(!tokenData) throw new Error("Invalid")
 
   var preKey = Object.keys(tokenData.authModelFieldData);
   console.log("preKey ==> ", preKey);
 
   var postKey = Object.keys(req.body);
 
-  try {
+  
     if (Object.keys(req.body).length === 0) {
       throw new Error("Please Enter Data");
     }
@@ -79,10 +85,15 @@ exports.authCreateData = async (req, res) => {
       throw new Error("Validation Error");
     }
 
+    const fieldConditions = Object.entries(req.body).map(([key, value]) => ({
+      [`modelFieldData.${key}`]: value,
+    }));
+
+    // Combine with other fixed conditions
     const findData = await authCreate.findOne({
       projectKey: token,
       modelName: "signUp",
-      modelFieldData: req.body,
+      $or: fieldConditions,
     });
 
     if (findData) throw new Error("Already User Exist!!");

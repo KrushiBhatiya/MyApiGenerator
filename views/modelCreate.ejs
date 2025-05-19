@@ -262,7 +262,7 @@
     <button type="button" style="margin-left: 20px">
       <a href="/projectPage">Back</a>
     </button>
-    <button type="button" id="authButton" style="margin-left: 20px; display: none">
+    <button type="button" id="authButton" style="margin-left: 20px;">
       <a href="/authPage">Clik here ! To get Authentication API</a>
     </button>
 
@@ -273,11 +273,6 @@
     </div>
 
     <script>
-      const authCheck = localStorage.getItem("authCheck");
-
-      if (authCheck === "true") {
-        document.getElementById('authButton').style.display = "inline-block"
-      }
 
       const projectToken = sessionStorage.getItem("projectData");
       const TokenData = JSON.parse(projectToken);
@@ -452,6 +447,7 @@
 
       // Function to gather form data and submit
       async function submitData() {
+        // alert()
         const projectKey = document.getElementById("projectKey").value.trim();
         const modelname = document.getElementById("modelname").value.trim();
         const textFields = document.querySelectorAll('input[name="textField"]');
@@ -519,6 +515,9 @@
             <li><strong>PATCH :</strong> ${apiBaseUrl}/:id</li>
         </ul>
     `;
+
+    console.log("example ==> ",example);
+    
 
         const exampleOutput = `
             <h2>OBJECT EXAMPLE</h2>

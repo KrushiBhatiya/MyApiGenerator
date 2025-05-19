@@ -19,9 +19,17 @@ exports.createProject = async(req, res) => {
     await PC.create(req.body)
     res.json({ status: 'success'});
 }
+exports.checkProjectName = async(req , res) => {
+    const projectName = req.query.projectKey
+    
+    const exists = await PC.findOne({ "projectKey" : projectName });
+    // console.log("==> ",exists);
+
+    res.json({ exists: !!exists });
+}
 exports.projectCollection = async(req , res) => {
     const { projectKey } = req.query;
-    const projectData = await MC.find({ projectKey })
+    const projectData = await MC.find({ projectKey : projectKey })
     // console.log("go ==> ",projectData);
     
     res.json({ collections: projectData });

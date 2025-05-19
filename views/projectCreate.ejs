@@ -219,8 +219,7 @@
       required
     />
     <br /><br /><br />
-    <input type="checkbox" name="check" id="authApi" onclick="authApiCheck()" />
-    If you want to get Auth API for this Project <br /><br /><br />
+   
     <button id="submitButton" onclick="submitData()">
       Create Project And Generate its Key
     </button>
@@ -232,50 +231,7 @@
 
     <div id="tokenDisplay"></div>
     <script>
-      let randomKey = "";
-     async function authApiCheck() {
-        var authApi = document.getElementById("authApi").checked;
-        // alert(authApi)
-        localStorage.setItem("authCheck", authApi);
-
-        if(!authApi) return
-
-        try {
-         
-           const response = await fetch(
-          `/check-authCollection?projectKey=${randomKey}&authModelName=signUp`
-        );
-        const checkProjectdata = await response.json();
-
-        if (checkProjectdata.exists) {
-          alert("This Auth API already exists in the project.");
-          return;
-        }
-        
-          fetch("/authApiGenerate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              projectKey: randomKey,
-              authModelName: "signUp",
-              authModelFieldData: {
-                name: "String",
-                email: "Email",
-                password: "String",
-              },
-            }),
-          })
-            .then((response) => response.json())
-            .catch((err) => console.error("Error:", err));
-        
-
-        
-        } catch (error) {
-            console.log(error);
-        }
-
-       
-      }
+   
 
       // Function to generate a random key (token)
       function generateRandomKey() {
@@ -332,7 +288,7 @@
           return;
         }
 
-        randomKey = generateRandomKey();
+        let randomKey = generateRandomKey();
         document.getElementById(
           "tokenDisplay"
         ).textContent = `Authorization : ${randomKey}`;
@@ -355,7 +311,7 @@
             projectName: projectName,
           }),
         })
-          .then((response) => authCreateModel())
+          .then((response) => response.json())
           .catch((err) => console.error("Error:", err));
         document.querySelector('input[name="projectName"]').value = "";
       }
@@ -373,12 +329,11 @@
       };
       function clearData() {
         // Remove data from localStorage
-        sessionStorage.removeItem("projectData");
+        // sessionStorage.removeItem("projectData");
         // Clear the displayed data
         document.getElementById("tokenDisplay").textContent = "";
 
         document.querySelector('input[name="projectName"]').value = "";
-        document.querySelector('input[name="check"]').checked = false;
         localStorage.removeItem("authCheck");
       }
     </script>
