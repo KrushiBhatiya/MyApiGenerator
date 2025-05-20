@@ -342,7 +342,11 @@
         for (const [key, type] of Object.entries(model)) {
           if (type === "String") {
             example[key] = "Sample Text"; // Example string
-          } else if (type === "Boolean") {
+          } 
+          else if (type === "Email") {
+            example[key] = "sample@gmail.com"; // Example string
+          }
+          else if (type === "Boolean") {
             example[key] = Math.random() > 0.5; // Random true/false
           } else if (type === "Number") {
             example[key] = Math.floor(Math.random() * 100000); // Random number
