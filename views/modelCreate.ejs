@@ -214,7 +214,7 @@
       type="text"
       name="projectKey"
       placeholder="Enter projectKey"
-      id="projectKey"
+      id="projectName"
       required
     />
     <br /><br />
@@ -262,8 +262,13 @@
     <button type="button" style="margin-left: 20px">
       <a href="/projectPage">Back</a>
     </button>
-    <button type="button" id="authButton" style="margin-left: 20px;">
-      <a href="/authPage">Clik here ! To get Authentication API</a>
+    <button type="button" id="authButton" style="margin-left: 20px">
+      <a href="/authPage">Click here ! To get Authentication API</a>
+    </button>
+    <button type="button" id="authButton" style="margin-left: 20px">
+      <a href="/allCollectionPage"
+        >Click here ! To Check Your All Collections</a
+      >
     </button>
 
     <div id="tokenDisplay"></div>
@@ -273,18 +278,28 @@
     </div>
 
     <script>
-
-      const projectToken = sessionStorage.getItem("projectData");
-      const TokenData = JSON.parse(projectToken);
-      function fetchData() {
-        document
-          .getElementById("typeDropdown")
-          .addEventListener("change", function () {
-            let collectionDropdown =
+      let valueToken = ''
+      document
+        .getElementById("projectName")
+        .addEventListener("input", function () {
+           valueToken = this.value;
+          });
+          
+          const projectToken = sessionStorage.getItem("projectData");
+          const TokenData = JSON.parse(projectToken);
+          function fetchData() {
+            // alert(projectKey)
+            document
+            .getElementById("typeDropdown")
+            .addEventListener("change", function () {
+              let collectionDropdown =
               document.getElementById("collectionDropdown");
+              
+              console.log("Current value:", valueToken);
+            console.log("check");
 
             if (this.value === "connect") {
-              fetch(`/projectCollection?projectKey=${TokenData.token}`)
+              fetch(`/projectCollection?projectKey=${valueToken}`)
                 .then((response) => response.json())
                 .then((data) => {
                   collectionDropdown.innerHTML =
@@ -375,7 +390,7 @@
         // Fetch and populate collection dropdown dynamically
         select.addEventListener("change", function () {
           if (this.value === "connect") {
-            fetch(`/projectCollection?projectKey=${TokenData.token}`)
+            fetch(`/projectCollection?projectKey=${valueToken}`)
               .then((response) => response.json())
               .then((data) => {
                 collectionDropdown.innerHTML =
@@ -448,7 +463,7 @@
       // Function to gather form data and submit
       async function submitData() {
         // alert()
-        const projectKey = document.getElementById("projectKey").value.trim();
+        const projectKey = valueToken;
         const modelname = document.getElementById("modelname").value.trim();
         const textFields = document.querySelectorAll('input[name="textField"]');
         const dropdowns = document.querySelectorAll('select[name="dropdown"]');
@@ -462,7 +477,7 @@
         if (
           modelname.includes(" ") ||
           projectKey.includes(" ") ||
-          projectKey != TokenData.token
+          projectKey != projectKey
         ) {
           allFieldsFilled = false;
         }
@@ -489,6 +504,18 @@
           return;
         }
 
+        const projectCheck = await fetch(
+          `/check-projectName?projectKey=${projectKey}`
+        );
+        const checkProjectName = await projectCheck.json();
+        // console.log("checkProjectName ==> ",checkProjectName);
+
+        if (!checkProjectName.exists) {
+          alert("Invalid Project Key.");
+          document.getElementById("projectName").value = "";
+          return;
+        }
+
         const response = await fetch(
           `/check-collection?projectKey=${projectKey}&modelName=${modelname}`
         );
@@ -498,6 +525,7 @@
           alert("This collection already exists in the project.");
           return;
         }
+        // console.log("model ==> ",model);
 
         const example = generateExample(model);
 
@@ -516,8 +544,7 @@
         </ul>
     `;
 
-    console.log("example ==> ",example);
-    
+        // console.log("example ==> ",example);
 
         const exampleOutput = `
             <h2>OBJECT EXAMPLE</h2>
@@ -538,7 +565,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            projectKey: TokenData.token,
+            projectKey: projectKey,
             modelName: modelname,
             modelField: model,
           }),
@@ -584,6 +611,8 @@
       // window load data get
       window.onload = function () {
         const storedData = sessionStorage.getItem("formData");
+        console.log("check ==> ", storedData);
+
         if (storedData) {
           const data = JSON.parse(storedData);
           displayData(data);

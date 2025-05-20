@@ -109,14 +109,12 @@
         justify-content: flex-start;
         align-items: center;
         text-align: center;
-        background: linear-gradient(to right, #00c6ff, #0072ff);
+
         border-radius: 10px;
         width: 40%;
         max-width: 525px;
-        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
       }
       #exampleDisplay {
-        display: flex;
         margin-top: 20px;
         font-size: 16px;
         line-height: 1.6;
@@ -124,14 +122,14 @@
         margin-bottom: 20px;
         color: #fff;
         display: flex;
+        flex-direction: column;
         justify-content: flex-start;
         align-items: center;
         text-align: center;
-        background: linear-gradient(to right, #00c6ff, #0072ff);
+
         border-radius: 10px;
-        width: 50%;
-        max-width: 590px;
-        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+        width: 80%;
+        max-width: 525px;
       }
       #first,
       #second {
@@ -223,11 +221,56 @@
 
       @media (max-width: 280px) {
       }
+      .st {
+        width: 100%;
+        outline: 5px solid #1e1e2f;
+      }
+
+      .api-method-block {
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+        padding: 20px;
+        margin: 20px 10px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        text-align: left;
+        height: 225px;
+        overflow-y: scroll;
+      }
+
+      .api-method-block h2 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #00c6ff;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+        text-align: left !important;
+      }
+
+      .api-method-block ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .api-method-block li {
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+      .invisible-scrollbar {
+        display: block;
+        overflow: auto;
+        padding: 1em;
+        margin: 1em auto;
+      }
+      .invisible-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
     </style>
   </head>
 
   <body>
-    <h1>Your Authentication API</h1>
+    <h1>Your All Collection Of This Project</h1>
 
     <input
       type="text"
@@ -246,10 +289,7 @@
     <div id="tokenDisplay"></div>
     <div class="display-container">
       <div id="apiMethodsDisplay"></div>
-      <div id="exampleDisplay">
-        <div id="first"></div>
-        <div id="second"></div>
-      </div>
+      <div id="exampleDisplay"></div>
     </div>
     <button type="button" onclick="clearData()">Clear Data</button>
     <button type="button" style="margin-left: 20px">
@@ -283,105 +323,109 @@
             return;
           }
 
-          const response = await fetch(
-            `/check-authCollection?projectKey=${projectKey}&authModelName=signUp`
+          const getAllCollection = await fetch(
+            `/getAllCollection?projectKey=${projectKey}`
           );
-          const checkProjectdata = await response.json();
-
-          if (checkProjectdata.exists) {
-            alert("This Auth API already exists in the project.");
-            document.getElementById("projectName").value = "";
-            return;
-          }
-
-          const apiMethods = `
-          <h2>API METHODS</h2>
-          <ul>
-              <li><strong>POST :</strong> https://generateapi.onrender.com/auth/signUp</li>
-              <li><strong>POST :</strong> https://generateapi.onrender.com/auth/login</li>
-
-          </ul>
-      `;
-
-          const ex = {
-            name: "test",
-            email: "test@gmail.com",
-            password: "test",
-          };
-
-          const exampleOutput = `<h2>SignUp</h2>
-
-      <pre>${JSON.stringify(ex, null, 4)}</pre>
-
-      `;
-
-          const ex1 = { email: "test@gmail.com", password: "test" };
-
-          const exampleOutput1 = `<h2>Login</h2>
-
-      <pre>${JSON.stringify(ex1, null, 4)}</pre>
-
-      `;
-
-          const dataSt = { apiMethods, exampleOutput, exampleOutput1 };
-          
-          sessionStorage.setItem("authData", JSON.stringify(dataSt));
-
-          fetch("/authApiGenerate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              projectKey: projectKey,
-              modelName: "signUp",
-              modelField: {
-                name: "String",
-                email: "Email",
-                password: "String",
-              },
-            }),
-          })
-            .then((response) => response.json())
-            .catch((err) => console.error("Error:", err));
-          document.getElementById("projectName").value = "";
-          displayData(dataSt);
+          const allCollectionData = await getAllCollection.json();
+          const stData = allCollectionData.allData;
+          sessionStorage.setItem("collection", JSON.stringify(stData));
+          document.getElementById("projectName").value = ""
+          dispalyData(stData);
         } catch (error) {
           console.log(error);
         }
       }
 
-      // Function to display token and example code of API
-      function displayData(data) {
-        // console.log(data);
-        
-        document.getElementById("apiMethodsDisplay").innerHTML =
-          data.apiMethods;
-        document.getElementById("first").innerHTML = data.exampleOutput;
-        document.getElementById("second").innerHTML = data.exampleOutput1;
-        document.getElementById("apiMethodsDisplay").style.padding = "20px";
-        document.getElementById("exampleDisplay").style.padding = "20px";
+      function generateExample(model) {
+        const example = {};
+        const testId = "67cc2c0961bee872e4b5a974";
+        for (const [key, type] of Object.entries(model)) {
+          if (type === "String") {
+            example[key] = "Sample Text"; // Example string
+          } else if (type === "Boolean") {
+            example[key] = Math.random() > 0.5; // Random true/false
+          } else if (type === "Number") {
+            example[key] = Math.floor(Math.random() * 100000); // Random number
+          } else if (type === "Date") {
+            const randomDate = new Date();
+            randomDate.setDate(
+              randomDate.getDate() - Math.floor(Math.random() * 1000)
+            ); // Random past date
+            example[key] = randomDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+          } else if (type === "SingleFile") {
+            example[key] = `${key}_${Math.random()
+              .toString(36)
+              .substring(7)}.png`; // Random file path
+          } else if (type === "MultiFile") {
+            const fileCount = Math.floor(Math.random() * 5) + 1; // 1 to 5 files
+            example[key] = Array.from(
+              { length: fileCount },
+              (_, i) =>
+                `${key}_${i + 1}_${Math.random().toString(36).substring(7)}.png`
+            );
+          } else if (type.startsWith("connect:")) {
+            example[key] = `${testId}`;
+          }
+          console.log("check loop log ==> ", example);
+        }
+        return example;
       }
+
+      function dispalyData(stData) {
+        console.log(stData);
+        let apiMethods = "";
+        let example = "";
+        let exampleOutput = "";
+        stData.map((i, index) => {
+          const apiBaseUrl = `https://generateapi.onrender.com/api/${i.modelName}`;
+          apiMethods += `
+          <div class="api-method-block invisible-scrollbar">
+              <h2>API METHODS - ${i.modelName}</h2>
+              <ul>
+                  <li><strong>POST :</strong> ${apiBaseUrl}</li>
+                  <li><strong>GET :</strong> ${apiBaseUrl}</li>
+                  <li><strong>DELETE :</strong> ${apiBaseUrl}/:id</li>
+                  <li><strong>PATCH :</strong> ${apiBaseUrl}/:id</li>
+              </ul>
+              </div>
+              
+          `;
+          example = generateExample(i.modelField);
+          exampleOutput += `
+          <div class="api-method-block invisible-scrollbar">
+            <h2>OBJECT EXAMPLE</h2>
+        <pre>${JSON.stringify(example, null, 4)}</pre>
+        </div>
+    `;
+
+          console.log("==>", exampleOutput);
+        });
+        document.getElementById("apiMethodsDisplay").innerHTML = apiMethods;
+        document.getElementById("exampleDisplay").innerHTML = exampleOutput;
+      }
+
 
       function clearData() {
         // Remove data from localStorage
-        sessionStorage.removeItem("authData");
+        sessionStorage.removeItem("collection");
 
-        // Clear the displayed data
+        document.getElementById("projectName").value = ""
         document.getElementById("apiMethodsDisplay").innerHTML = "";
         document.getElementById("exampleDisplay").innerHTML = "";
         document.getElementById("apiMethodsDisplay").style.padding = "0px";
         document.getElementById("exampleDisplay").style.padding = "0px";
       }
 
-      // window load data get
+
       window.onload = function () {
-        const storedData = sessionStorage.getItem("authData");
+        const storedData = sessionStorage.getItem("collection");
+        // console.log("check ==> ",storedData);
+
         if (storedData) {
-          data = JSON.parse(storedData);
-          displayData(data);
+          const data = JSON.parse(storedData);
+          dispalyData(data);
         }
       };
-
-      // Function to clear data from session storage and example code
     </script>
   </body>
 </html>

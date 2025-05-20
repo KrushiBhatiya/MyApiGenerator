@@ -49,3 +49,13 @@ exports.authApiGenerate = async(req , res) => {
     await MC.create(req.body)
     res.json({ status: 'success'});
 }
+exports.allCollectionPage = async(req , res) => {
+    res.render('allCollectionPage')
+}
+
+exports.getAllCollection = async(req , res) => {
+    const { projectKey } = req.query;
+    const allData = await MC.find({ projectKey : projectKey })
+    // console.log(allData);
+    res.json({allData : allData})
+}
