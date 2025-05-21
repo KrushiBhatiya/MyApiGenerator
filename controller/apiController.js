@@ -1,6 +1,6 @@
 const MC = require("../model/index");
 const MD = require("../model/modelData");
-const PD = require("../model/projectData")
+const PD = require("../model/projectData");
 const { parse, isValid: isValidDate } = require("date-fns");
 const cloudinary = require("cloudinary").v2;
 const mongoose = require("mongoose");
@@ -26,14 +26,14 @@ exports.authDataCheck = async (req, res) => {
     if (!authData) throw new Error("Invalid User");
 
     const flattenedData = {
-    _id: authData._id,
-    ...authData.modelFieldData,
-    __v: authData.__v
-};
+      _id: authData._id,
+      ...authData.modelFieldData,
+      __v: authData.__v,
+    };
     res.status(200).json({
       Status: "Success",
       Message: "User login Success",
-      data : flattenedData
+      data: flattenedData,
     });
   } catch (error) {
     res.status(404).json({
@@ -46,25 +46,22 @@ exports.authDataCheck = async (req, res) => {
 exports.authCreateData = async (req, res) => {
   var token = req.headers.authorization;
   // console.log("====");
-  
+
   try {
+    var tokenData = await MC.findOne({
+      projectKey: token,
+      modelName: "signUp",
+    });
 
-  var tokenData = await MC.findOne({
-    projectKey: token,
-    modelName: "signUp",
-  });
+    // console.log("tokenData ==> ",tokenData);
 
-  // console.log("tokenData ==> ",tokenData);
-  
+    // if(!tokenData) throw new Error("Invalid")
 
-  // if(!tokenData) throw new Error("Invalid")
+    var preKey = Object.keys(tokenData.modelField);
+    // console.log("preKey ==> ", preKey);
 
-  var preKey = Object.keys(tokenData.modelField);
-  // console.log("preKey ==> ", preKey);
+    var postKey = Object.keys(req.body);
 
-  var postKey = Object.keys(req.body);
-
-  
     if (Object.keys(req.body).length === 0) {
       throw new Error("Please Enter Data");
     }
@@ -137,7 +134,10 @@ exports.createData = async (req, res) => {
   var checkFieldValue = Object.values(tokenData.modelField);
 
   var preKey = Object.keys(tokenData.modelField);
+  // console.log("00000000", preKey);
+
   var postKey = Object.keys(req.body);
+  // console.log("1-1-1-1--1-1-1----", postKey);
 
   try {
     if (!validCollection) throw new Error("Invalid CollectionName");
@@ -176,9 +176,28 @@ exports.createData = async (req, res) => {
         }
       });
     }
-    if (JSON.stringify(preKey) !== JSON.stringify(postKey)) {
+
+    const areArraysEqual = (a, b) => {
+      if (a.length !== b.length) return false;
+      const sortedA = [...a].sort();
+      console.log("sortedA ==> ",sortedA);
+      
+      const sortedB = [...b].sort();
+      console.log("sortedB ==> ",sortedB);
+      
+      return sortedA.every((val, index) => val === sortedB[index]);
+    };
+
+    if (!areArraysEqual(preKey, postKey)) {
       throw new Error("Key doesn't Match");
     }
+    // console.log("===", JSON.stringify(preKey));
+    // console.log("-----", JSON.stringify(postKey));
+
+    // if (JSON.stringify(preKey) !== JSON.stringify(postKey)) {
+    //   // console.log("check");
+    //   throw new Error("Key doesn't Match");
+    // }
 
     // const allData = await MD.find({ apiKey: token })
 
@@ -587,11 +606,26 @@ exports.editData = async (req, res) => {
         }
       });
     }
-    // console.log("preKey ==> ",preKey);
-    // console.log("postKey ==> ",postKey);
-    if (JSON.stringify(preKey) !== JSON.stringify(postKey)) {
+
+    const areArraysEqual = (a, b) => {
+      if (a.length !== b.length) return false;
+      const sortedA = [...a].sort();
+      console.log("sortedA ==> ",sortedA);
+      
+      const sortedB = [...b].sort();
+      console.log("sortedB ==> ",sortedB);
+      
+      return sortedA.every((val, index) => val === sortedB[index]);
+    };
+
+    if (!areArraysEqual(preKey, postKey)) {
       throw new Error("Key doesn't Match");
     }
+    // console.log("preKey ==> ",preKey);
+    // console.log("postKey ==> ",postKey);
+    // if (JSON.stringify(preKey) !== JSON.stringify(postKey)) {
+    //   throw new Error("Key doesn't Match");
+    // }
 
     const filesMap = {};
 
