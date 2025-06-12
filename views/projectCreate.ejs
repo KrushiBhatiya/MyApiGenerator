@@ -14,6 +14,7 @@
         background: #1e1e2f;
         color: #fff;
         text-align: center;
+        padding: 0 20px ;
       }
 
       /* Heading style */
@@ -33,9 +34,9 @@
         border: 1px solid #3a3a6f;
         background-color: #2a2a3a;
         color: #fff;
-        min-width: 250px;
+        
         /* Initial minimum width */
-        max-width: 100%;
+        width: 30%;
         /* Allow expansion based on content */
         display: inline-block;
       }
@@ -168,18 +169,24 @@
         color: white;
       }
 
+      @media screen and (max-width:992px) {
+                input[type="text"],
+        select {
+          width: 50%;
+        }
+      }
+
       @media (max-width: 650px) {
         input[type="text"],
         select {
-          min-width: 200px;
+          width: 45%;
+        }
+        html{
+          padding: 0;
         }
       }
 
       @media (max-width: 576px) {
-        input[type="text"],
-        select {
-          min-width: 160px;
-        }
 
         h1 {
           font-size: 2.5rem;
@@ -189,15 +196,21 @@
       @media (max-width: 480px) {
         input[type="text"],
         select {
-          min-width: auto;
+          width: calc(100% - 27px);
+        }
+        button, #submitButton{
+          font-size: 13px;
         }
 
         h1 {
-          font-size: 2.2rem;
+          font-size: 1.8rem;
         }
       }
 
       @media (max-width: 440px) {
+        button, #submitButton{
+          margin-left: 0 !important;
+        }
       }
 
       @media (max-width: 360px) {

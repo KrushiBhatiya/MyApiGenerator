@@ -15,6 +15,12 @@
         color: #fff;
         text-align: center;
       }
+      .main-container {
+        max-width: calc(760px - 40px);
+        width: 100%;
+        margin: auto;
+        padding: 0 20px;
+      }
 
       /* Heading style */
       h1 {
@@ -33,9 +39,8 @@
         border: 1px solid #3a3a6f;
         background-color: #2a2a3a;
         color: #fff;
-        min-width: 250px;
         /* Initial minimum width */
-        max-width: 100%;
+        width: calc(100% - 30px);
         /* Allow expansion based on content */
         display: inline-block;
       }
@@ -85,7 +90,7 @@
         flex-direction: column;
         gap: 15px;
         margin: 20px auto;
-        width: 400px;
+        width: 100%;
         align-items: center;
       }
 
@@ -94,6 +99,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        width: 100%;
       }
 
       /* API Methods and token display styling */
@@ -124,6 +130,8 @@
 
       #apiMethodsDisplay li {
         margin-bottom: 10px;
+        word-break: break-all;
+        word-wrap: break-word;
       }
 
       /* Example display style */
@@ -167,135 +175,128 @@
         text-decoration: none;
         color: white;
       }
-      @media (max-width: 650px) {
-        input[type="text"],
-        select {
-          min-width: 200px;
-        }
+      .Authorization-api {
+        margin-top: 20px;
       }
 
-      @media (max-width: 576px) {
-        input[type="text"],
-        select {
-          min-width: 160px;
-        }
-
+      @media screen and (max-width: 425px) {
         h1 {
-          font-size: 2.5rem;
+          font-size: 2.4rem;
         }
-      }
-
-      @media (max-width: 480px) {
-        input[type="text"],
-        select {
-          min-width: auto;
+        .main-container {
+          max-width: calc(100% - 40px);
         }
-
-        h1 {
-          font-size: 2.2rem;
+        .container button {
+          padding: 0;
+          width: 90px;
+          height: 36px;
         }
-      }
-
-      @media (max-width: 440px) {
-      }
-
-      @media (max-width: 360px) {
-      }
-
-      @media (max-width: 280px) {
+        button,
+        #submitButton {
+          font-size: 14px;
+        }
       }
     </style>
   </head>
 
   <body>
-    <h1>Create Your Own Field</h1>
+    <div class="main-container">
+      <h1>Create Your Own Field</h1>
 
-    <input
-      type="text"
-      name="projectKey"
-      placeholder="Enter ProjectKey"
-      id="projectName"
-      required
-    />
-    <br /><br />
-    <input
-      type="text"
-      name="modelname"
-      placeholder="Enter CollectionName"
-      id="modelname"
-      required
-    />
-    <!-- <br><br> -->
-    <div id="formContainer">
-      <div class="container">
-        <input
-          type="text"
-          placeholder="Enter FieldName"
-          name="textField"
-          required
-        />
-        <select id="typeDropdown" name="dropdown" required>
-          <option value="" selected disabled>SELECT TYPE</option>
-          <option value="String">Text</option>
-          <option value="Number">Number</option>
-          <option value="Boolean">Boolean</option>
-          <option value="Date">Date</option>
-          <option value="SingleFile">File ( Upload Single File )</option>
-          <option value="MultiFile">File ( Upload Multiple File )</option>
-          <option value="connect">Connect With other Collection</option>
-        </select>
-        <select
-          id="collectionDropdown"
-          name="collection"
-          style="display: none"
-        ></select>
-        <button type="button" onclick="removeFormField(this)">-</button>
+      <input
+        type="text"
+        name="projectKey"
+        placeholder="Enter ProjectKey"
+        id="projectName"
+        required
+      />
+      <br /><br />
+      <input
+        type="text"
+        name="modelname"
+        placeholder="Enter CollectionName"
+        id="modelname"
+        required
+      />
+      <!-- <br><br> -->
+      <div id="formContainer">
+        <div class="container">
+          <input
+            type="text"
+            placeholder="Enter FieldName"
+            name="textField"
+            required
+          />
+          <select id="typeDropdown" name="dropdown" required>
+            <option value="" selected disabled>SELECT TYPE</option>
+            <option value="String">Text</option>
+            <option value="Number">Number</option>
+            <option value="Boolean">Boolean</option>
+            <option value="Date">Date</option>
+            <option value="SingleFile">File ( Upload Single File )</option>
+            <option value="MultiFile">File ( Upload Multiple File )</option>
+            <option value="connect">Connect With other Collection</option>
+          </select>
+          <select
+            id="collectionDropdown"
+            name="collection"
+            style="display: none"
+          ></select>
+          <button type="button" onclick="removeFormField(this)">-</button>
+          <button type="button" onclick="addFormField()">+</button>
+        </div>
+      </div>
+
+      <br />
+      <button id="submitButton" onclick="submitData()">
+        Create Collection And Generate API Key
+      </button>
+      <br /><br />
+      <button type="button" onclick="clearData()">Clear Data</button>
+      <button type="button" style="margin-left: 20px">
+        <a href="/projectPage">Back</a>
+      </button>
+      <button
+        type="button"
+        id="authButton"
+        class="Authorization-api"
+        style="margin-left: 20px"
+      >
+        <a href="/authPage">Click here ! To get Authentication API</a>
+      </button>
+      <br /><br />
+      <button type="button" id="authButton" style="margin-left: 20px">
+        <a href="/allCollectionPage"
+          >Click here ! To Check Your All Collections</a
+        >
+      </button>
+
+      <div id="tokenDisplay"></div>
+      <div class="display-container">
+        <div id="apiMethodsDisplay"></div>
+        <div id="exampleDisplay"></div>
       </div>
     </div>
 
-    <button type="button" onclick="addFormField()">+</button> <br /><br /><br />
-    <button id="submitButton" onclick="submitData()">
-      Create Collection And Generate API Key
-    </button>
-    <br /><br />
-    <button type="button" onclick="clearData()">Clear Data</button>
-    <button type="button" style="margin-left: 20px">
-      <a href="/projectPage">Back</a>
-    </button>
-    <button type="button" id="authButton" style="margin-left: 20px">
-      <a href="/authPage">Click here ! To get Authentication API</a>
-    </button>
-    <button type="button" id="authButton" style="margin-left: 20px">
-      <a href="/allCollectionPage"
-        >Click here ! To Check Your All Collections</a
-      >
-    </button>
-
-    <div id="tokenDisplay"></div>
-    <div class="display-container">
-      <div id="apiMethodsDisplay"></div>
-      <div id="exampleDisplay"></div>
-    </div>
-
     <script>
-      let valueToken = ''
+      let valueToken = "";
       document
         .getElementById("projectName")
         .addEventListener("input", function () {
-           valueToken = this.value;
-          });
-          
-          const projectToken = sessionStorage.getItem("projectData");
-          const TokenData = JSON.parse(projectToken);
-          function fetchData() {
-            // alert(projectKey)
-            document
-            .getElementById("typeDropdown")
-            .addEventListener("change", function () {
-              let collectionDropdown =
+          valueToken = this.value;
+        });
+
+      const projectToken = sessionStorage.getItem("projectData");
+      const TokenData = JSON.parse(projectToken);
+      function fetchData() {
+        // alert(projectKey)
+        document
+          .getElementById("typeDropdown")
+          .addEventListener("change", function () {
+            let collectionDropdown =
               document.getElementById("collectionDropdown");
-              
-              console.log("Current value:", valueToken);
+
+            console.log("Current value:", valueToken);
             console.log("check");
 
             if (this.value === "connect") {

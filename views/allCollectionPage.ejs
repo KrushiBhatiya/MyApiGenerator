@@ -142,6 +142,7 @@
 
       #apiMethodsDisplay li {
         margin-bottom: 10px;
+        word-break: break-all;
       }
 
       /* Example display style */
@@ -235,8 +236,8 @@
         max-width: 500px;
         box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
         text-align: left;
-        height: 225px;
-        overflow-y: scroll;
+        /* height: 225px;
+        overflow-y: scroll; */
       }
 
       .api-method-block h2 {
@@ -262,9 +263,20 @@
         overflow: auto;
         padding: 1em;
         margin: 1em auto;
+        height: 230px;
       }
       .invisible-scrollbar::-webkit-scrollbar {
         display: none;
+      }
+
+      @media screen and (max-width: 767px) {
+        #apiMethodsDisplay {
+          max-width: 100%;
+          width: 80%;
+        }
+        .invisible-scrollbar {
+          margin: 1em 0;
+        }
       }
     </style>
   </head>
@@ -329,7 +341,7 @@
           const allCollectionData = await getAllCollection.json();
           const stData = allCollectionData.allData;
           sessionStorage.setItem("collection", JSON.stringify(stData));
-          document.getElementById("projectName").value = ""
+          document.getElementById("projectName").value = "";
           dispalyData(stData);
         } catch (error) {
           console.log(error);
@@ -342,11 +354,9 @@
         for (const [key, type] of Object.entries(model)) {
           if (type === "String") {
             example[key] = "Sample Text"; // Example string
-          } 
-          else if (type === "Email") {
+          } else if (type === "Email") {
             example[key] = "sample@gmail.com"; // Example string
-          }
-          else if (type === "Boolean") {
+          } else if (type === "Boolean") {
             example[key] = Math.random() > 0.5; // Random true/false
           } else if (type === "Number") {
             example[key] = Math.floor(Math.random() * 100000); // Random number
@@ -381,8 +391,21 @@
         let example = "";
         let exampleOutput = "";
         stData.map((i, index) => {
-          const apiBaseUrl = `https://generateapi.onrender.com/api/${i.modelName}`;
-          apiMethods += `
+          if (i.modelName == "signUp") {
+            apiMethods += `
+          <div class="api-method-block invisible-scrollbar">
+              <h2>API METHODS - ${i.modelName}</h2>
+              <ul>
+                  <li><strong>POST :</strong> https://generateapi.onrender.com/auth/signUp</li>
+                  <li><strong>POST :</strong> https://generateapi.onrender.com/auth/login</li>
+                  
+              </ul>
+              </div>
+              
+          `;
+          } else {
+            const apiBaseUrl = `https://generateapi.onrender.com/api/${i.modelName}`;
+            apiMethods += `
           <div class="api-method-block invisible-scrollbar">
               <h2>API METHODS - ${i.modelName}</h2>
               <ul>
@@ -394,10 +417,13 @@
               </div>
               
           `;
+          }
+
+          
           example = generateExample(i.modelField);
           exampleOutput += `
           <div class="api-method-block invisible-scrollbar">
-            <h2>OBJECT EXAMPLE</h2>
+            <h2>OBJECT EXAMPLE - ${i.modelName}</h2>
         <pre>${JSON.stringify(example, null, 4)}</pre>
         </div>
     `;
@@ -408,18 +434,16 @@
         document.getElementById("exampleDisplay").innerHTML = exampleOutput;
       }
 
-
       function clearData() {
         // Remove data from localStorage
         sessionStorage.removeItem("collection");
 
-        document.getElementById("projectName").value = ""
+        document.getElementById("projectName").value = "";
         document.getElementById("apiMethodsDisplay").innerHTML = "";
         document.getElementById("exampleDisplay").innerHTML = "";
         document.getElementById("apiMethodsDisplay").style.padding = "0px";
         document.getElementById("exampleDisplay").style.padding = "0px";
       }
-
 
       window.onload = function () {
         const storedData = sessionStorage.getItem("collection");

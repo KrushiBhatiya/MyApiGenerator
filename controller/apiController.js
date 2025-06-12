@@ -180,11 +180,11 @@ exports.createData = async (req, res) => {
     const areArraysEqual = (a, b) => {
       if (a.length !== b.length) return false;
       const sortedA = [...a].sort();
-      console.log("sortedA ==> ",sortedA);
-      
+      console.log("sortedA ==> ", sortedA);
+
       const sortedB = [...b].sort();
-      console.log("sortedB ==> ",sortedB);
-      
+      console.log("sortedB ==> ", sortedB);
+
       return sortedA.every((val, index) => val === sortedB[index]);
     };
 
@@ -441,6 +441,7 @@ exports.createData = async (req, res) => {
 };
 async function populateFields(token, modelFieldData, modelFields) {
   let populatedItem = { ...modelFieldData };
+  console.log("populatedItem ==> ", populatedItem);
 
   for (const [key, value] of Object.entries(modelFieldData)) {
     if (
@@ -469,11 +470,16 @@ async function populateFields(token, modelFieldData, modelFields) {
 
           if (referencedData) {
             // Recursively populate the referenced data
-            populatedItem[key] = await populateFields(
+            const populatedSubData = await populateFields(
               token,
               referencedData.modelFieldData,
               referencedModel.modelField
             );
+
+            populatedItem[key] = {
+              _id: referencedData._id,
+              ...populatedSubData,
+            };
           }
         } catch (err) {
           console.error(`Error fetching ${referencedCollection}:`, err.message);
@@ -507,6 +513,9 @@ exports.viewData = async (req, res) => {
     const populatedData = await Promise.all(
       data.map(async (item) => {
         const { _id, modelFieldData } = item.toObject();
+        console.log("_id ==> ", _id);
+        console.log("modelFieldData ==> ", modelFieldData);
+
         return {
           _id,
           ...(await populateFields(
@@ -610,11 +619,11 @@ exports.editData = async (req, res) => {
     const areArraysEqual = (a, b) => {
       if (a.length !== b.length) return false;
       const sortedA = [...a].sort();
-      console.log("sortedA ==> ",sortedA);
-      
+      console.log("sortedA ==> ", sortedA);
+
       const sortedB = [...b].sort();
-      console.log("sortedB ==> ",sortedB);
-      
+      console.log("sortedB ==> ", sortedB);
+
       return sortedA.every((val, index) => val === sortedB[index]);
     };
 
