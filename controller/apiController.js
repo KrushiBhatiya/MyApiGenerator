@@ -43,6 +43,7 @@ exports.authDataCheck = async (req, res) => {
   }
 };
 
+
 exports.authCreateData = async (req, res) => {
   var token = req.headers.authorization;
   // console.log("====");
@@ -488,6 +489,57 @@ async function populateFields(token, modelFieldData, modelFields) {
     }
   }
   return populatedItem;
+}
+
+exports.authData = async (req, res) => {
+  var token = req.headers.authorization;
+  var collectionName = "signUp";
+
+  try {
+    // Validate collection
+    const validCollection = await MC.findOne({
+      projectKey: token,
+      modelName: collectionName,
+    });
+    if (!validCollection) throw new Error("Invalid CollectionName");
+
+    // Fetch data from the requested collection
+    const data = await MD.find({
+      projectKey: token,
+      modelName: collectionName,
+    });
+    if (data.length === 0) throw new Error("Data not found");
+    // console.log("all data ==> ",data);
+
+    // Process data with recursive population
+    const populatedData = await Promise.all(
+      data.map(async (item) => {
+        const { _id, modelFieldData } = item.toObject();
+        console.log("_id ==> ", _id);
+        console.log("modelFieldData ==> ", modelFieldData);
+
+        return {
+          _id,
+          ...(await populateFields(
+            token,
+            modelFieldData,
+            validCollection.modelField
+          )),
+        };
+      })
+    );
+
+    res.status(200).json({
+      Status: "Success",
+      Message: "Record Get Successfully",
+      Data: populatedData,
+    });
+  } catch (error) {
+    res.status(404).json({
+      Status: "Fail",
+      Message: error.message,
+    });
+  }
 }
 exports.viewData = async (req, res) => {
   var token = req.headers.authorization;
