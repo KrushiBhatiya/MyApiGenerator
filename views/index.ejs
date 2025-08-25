@@ -105,7 +105,7 @@
     <script>
         function goToProject() {
             let currentUrl = window.location.origin + "/";
-            alert(currentUrl);
+            // alert(currentUrl);
             let myURL = JSON.stringify(currentUrl);
             sessionStorage.setItem('currentURL', myURL);
             window.location.href = "/projectPage";
