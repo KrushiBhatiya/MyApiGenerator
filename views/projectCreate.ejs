@@ -281,10 +281,6 @@
 
         // Function to gather form data and submit
         function submitData() {
-            let currentUrl = window.location.origin + "/";
-            alert(currentUrl)
-            let myURL = JSON.stringify(currentUrl)
-            sessionStorage.setItem('currentURL', myURL)
             const projectName = document.getElementById("projectName").value.trim();
 
             let allFieldsFilled = true;
