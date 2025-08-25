@@ -309,6 +309,9 @@
     </button>
 
     <script>
+
+      let currentURL = sessionStorage.getItem('currentURL')
+        let myURL = JSON.parse(currentURL)
       async function submitData() {
         const projectKey = document.getElementById("projectName").value.trim();
         // alert(projectKey)
@@ -396,15 +399,15 @@
           <div class="api-method-block invisible-scrollbar">
               <h2>API METHODS - ${i.modelName}</h2>
               <ul>
-                  <li><strong>POST :</strong> https://myapigenerator.onrender.com/auth/signUp</li>
-                  <li><strong>POST :</strong> https://myapigenerator.onrender.com/auth/login</li>
-                  <li><strong>GET :</strong> https://myapigenerator.onrender.com/auth/authUser</li>
+                  <li><strong>POST :</strong> ${myURL}auth/signUp</li>
+                  <li><strong>POST :</strong> ${myURL}auth/login</li>
+                  <li><strong>GET :</strong> ${myURL}auth/authUser</li>
               </ul>
               </div>
               
           `;
           } else {
-            const apiBaseUrl = `https://myapigenerator.onrender.com/api/${i.modelName}`;
+            const apiBaseUrl = `${myURL}api/${i.modelName}`;
             apiMethods += `
           <div class="api-method-block invisible-scrollbar">
               <h2>API METHODS - ${i.modelName}</h2>

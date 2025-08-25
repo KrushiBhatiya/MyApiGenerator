@@ -1,238 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Form</title>
     <style>
-      /* General body styling */
-      body,
-      html {
-        margin: 0;
-        padding: 0;
-        font-family: "Poppins", sans-serif;
-        background: #1e1e2f;
-        color: #fff;
-        text-align: center;
-        padding: 0 20px ;
-      }
-
-      /* Heading style */
-      h1 {
-        font-size: 3rem;
-        color: #fff;
-        margin-bottom: 30px;
-        text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.1);
-      }
-
-      /* Style for input fields */
-      input[type="text"],
-      select {
-        padding: 12px;
-        font-size: 14px;
-        border-radius: 5px;
-        border: 1px solid #3a3a6f;
-        background-color: #2a2a3a;
-        color: #fff;
+        /* General body styling */
         
-        /* Initial minimum width */
-        width: 30%;
-        /* Allow expansion based on content */
-        display: inline-block;
-      }
-
-      /* Placeholder color for input fields */
-      input[type="text"]::placeholder,
-      select::placeholder {
-        color: #b0aeae;
-        /* Darker placeholder text */
-      }
-
-      input[type="text"]:focus,
-      select:focus {
-        outline: none;
-        border-color: #0072ff;
-      }
-
-      /* Button styles */
-      button,
-      #submitButton {
-        background: linear-gradient(to right, #00c6ff, #0072ff);
-        color: #fff;
-        font-size: 16px;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
-        transition: all 0.3s ease-in-out;
-      }
-
-      button:hover,
-      #submitButton:hover {
-        background: linear-gradient(to right, #0072ff, #00c6ff);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
-        transform: translateY(-5px);
-      }
-
-      button:active,
-      #submitButton:active {
-        transform: translateY(2px);
-        box-shadow: none;
-      }
-
-      /* Container for dynamic form fields */
-      #formContainer {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin: 20px auto;
-        width: 400px;
-        align-items: center;
-      }
-
-      /* Each dynamic field row */
-      .container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      /* API Methods and token display styling */
-      #apiMethodsDisplay,
-      #exampleDisplay {
-        margin-top: 20px;
-        font-size: 16px;
-        line-height: 1.6;
-        text-align: left;
-        margin-bottom: 20px;
-        color: #fff;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        text-align: center;
-        background: linear-gradient(to right, #00c6ff, #0072ff);
-        border-radius: 10px;
-        width: 80%;
-        max-width: 525px;
-        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      #apiMethodsDisplay ul {
-        list-style-type: none;
-        padding-left: 0;
-      }
-
-      #apiMethodsDisplay li {
-        margin-bottom: 10px;
-      }
-
-      /* Example display style */
-      #exampleDisplay pre {
-        text-align: left;
-        /* Align text to the left to show object structure */
-        white-space: pre-wrap;
-        /* Preserve formatting like line breaks and spaces */
-        font-family: sans-serif;
-        font-size: 18px;
-        margin: 0;
-        color: #fff;
-      }
-
-      /* Token display style */
-      #tokenDisplay {
-        margin-top: 20px;
-        font-size: 18px;
-        font-weight: bold;
-        color: #00c6ff;
-      }
-
-      #apiMethodsDisplay h2,
-      #exampleDisplay h2 {
-        color: #fff;
-        font-size: 24px;
-        text-align: center;
-        margin: 10px 0px;
-        /* Space between title and content */
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-      }
-
-      .display-container {
-        display: flex;
-        justify-content: space-evenly;
-        flex-wrap: wrap;
-        width: 100%;
-      }
-
-      a {
-        text-decoration: none;
-        color: white;
-      }
-
-      @media screen and (max-width:992px) {
-                input[type="text"],
-        select {
-          width: 50%;
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            background: #1e1e2f;
+            color: #fff;
+            text-align: center;
+            padding: 0 20px;
         }
-      }
-
-      @media (max-width: 650px) {
+        /* Heading style */
+        
+        h1 {
+            font-size: 3rem;
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.1);
+        }
+        /* Style for input fields */
+        
         input[type="text"],
         select {
-          width: 45%;
+            padding: 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #3a3a6f;
+            background-color: #2a2a3a;
+            color: #fff;
+            /* Initial minimum width */
+            width: 30%;
+            /* Allow expansion based on content */
+            display: inline-block;
         }
-        html{
-          padding: 0;
+        /* Placeholder color for input fields */
+        
+        input[type="text"]::placeholder,
+        select::placeholder {
+            color: #b0aeae;
+            /* Darker placeholder text */
         }
-      }
-
-      @media (max-width: 576px) {
-
-        h1 {
-          font-size: 2.5rem;
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #0072ff;
         }
-      }
-
-      @media (max-width: 480px) {
-        input[type="text"],
-        select {
-          width: calc(100% - 27px);
+        /* Button styles */
+        
+        button,
+        #submitButton {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: #fff;
+            font-size: 16px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
         }
-        button, #submitButton{
-          font-size: 13px;
+        
+        button:hover,
+        #submitButton:hover {
+            background: linear-gradient(to right, #0072ff, #00c6ff);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px);
         }
-
-        h1 {
-          font-size: 1.8rem;
+        
+        button:active,
+        #submitButton:active {
+            transform: translateY(2px);
+            box-shadow: none;
         }
-      }
-
-      @media (max-width: 440px) {
-        button, #submitButton{
-          margin-left: 0 !important;
+        /* Container for dynamic form fields */
+        
+        #formContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px auto;
+            width: 400px;
+            align-items: center;
         }
-      }
-
-      @media (max-width: 360px) {
-      }
-
-      @media (max-width: 280px) {
-      }
+        /* Each dynamic field row */
+        
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* API Methods and token display styling */
+        
+        #apiMethodsDisplay,
+        #exampleDisplay {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: left;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 525px;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #apiMethodsDisplay ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        #apiMethodsDisplay li {
+            margin-bottom: 10px;
+        }
+        /* Example display style */
+        
+        #exampleDisplay pre {
+            text-align: left;
+            /* Align text to the left to show object structure */
+            white-space: pre-wrap;
+            /* Preserve formatting like line breaks and spaces */
+            font-family: sans-serif;
+            font-size: 18px;
+            margin: 0;
+            color: #fff;
+        }
+        /* Token display style */
+        
+        #tokenDisplay {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00c6ff;
+        }
+        
+        #apiMethodsDisplay h2,
+        #exampleDisplay h2 {
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+            margin: 10px 0px;
+            /* Space between title and content */
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .display-container {
+            display: flex;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        a {
+            text-decoration: none;
+            color: white;
+        }
+        
+        @media screen and (max-width:992px) {
+            input[type="text"],
+            select {
+                width: 50%;
+            }
+        }
+        
+        @media (max-width: 650px) {
+            input[type="text"],
+            select {
+                width: 45%;
+            }
+            html {
+                padding: 0;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            input[type="text"],
+            select {
+                width: calc(100% - 27px);
+            }
+            button,
+            #submitButton {
+                font-size: 13px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 440px) {
+            button,
+            #submitButton {
+                margin-left: 0 !important;
+            }
+        }
+        
+        @media (max-width: 360px) {}
+        
+        @media (max-width: 280px) {}
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <h1>Create Your Project</h1>
 
-    <input
-      type="text"
-      name="projectName"
-      placeholder="Enter ProjectName"
-      id="projectName"
-      required
-    />
+    <input type="text" name="projectName" placeholder="Enter ProjectName" id="projectName" required />
     <br /><br /><br />
-   
+
     <button id="submitButton" onclick="submitData()">
       Create Project And Generate its Key
     </button>
@@ -244,111 +237,120 @@
 
     <div id="tokenDisplay"></div>
     <script>
-   
-
-      // Function to generate a random key (token)
-      function generateRandomKey() {
-        const characters =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = "";
-        const length = 16; // Length of the random key
-        for (let i = 0; i < length; i++) {
-          result += characters.charAt(
-            Math.floor(Math.random() * characters.length)
-          );
-        }
-        return result;
-      }
-
-      function authCreateModel() {
-        // console.log("check");
-
-        const authApiCheck = localStorage.getItem("authCheck");
-        console.log(authApiCheck);
-
-        if (authApiCheck === "true") {
-          fetch("/authApiGenerate", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              projectKey: randomKey,
-              authModelName: "signUp",
-              authModelFieldData: {
-                name: "String",
-                email: "Email",
-                password: "String",
-              },
-            }),
-          })
-            .then((response) => response.json())
-            .catch((err) => console.error("Error:", err));
-          document.querySelector('input[name="check"]').checked = false;
-        }
-      }
-
-      // Function to gather form data and submit
-      function submitData() {
-        const projectName = document.getElementById("projectName").value.trim();
-
-        let allFieldsFilled = true;
-
-        if (projectName.includes(" ") || projectName == "") {
-          allFieldsFilled = false;
+        // Function to generate a random key (token)
+        function generateRandomKey() {
+            const characters =
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let result = "";
+            const length = 16; // Length of the random key
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(
+                    Math.floor(Math.random() * characters.length)
+                );
+            }
+            return result;
         }
 
-        if (!allFieldsFilled) {
-          alert("Please Provide valid data before generating the Project key.");
-          return;
+        function authCreateModel() {
+            // console.log("check");
+
+            const authApiCheck = localStorage.getItem("authCheck");
+            console.log(authApiCheck);
+
+            if (authApiCheck === "true") {
+                fetch("/authApiGenerate", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            projectKey: randomKey,
+                            authModelName: "signUp",
+                            authModelFieldData: {
+                                name: "String",
+                                email: "Email",
+                                password: "String",
+                            },
+                        }),
+                    })
+                    .then((response) => response.json())
+                    .catch((err) => console.error("Error:", err));
+                document.querySelector('input[name="check"]').checked = false;
+            }
         }
 
-        let randomKey = generateRandomKey();
-        document.getElementById(
-          "tokenDisplay"
-        ).textContent = `Authorization : ${randomKey}`;
+        // Function to gather form data and submit
+        function submitData() {
+            let currentUrl = window.location.origin + "/";
+            alert(currentUrl)
+            let myURL = JSON.stringify(currentUrl)
+            sessionStorage.setItem('currentURL', myURL)
+            const projectName = document.getElementById("projectName").value.trim();
 
-        const data = {
-          token: randomKey,
+            let allFieldsFilled = true;
+
+            if (projectName.includes(" ") || projectName == "") {
+                allFieldsFilled = false;
+            }
+
+            if (!allFieldsFilled) {
+                alert("Please Provide valid data before generating the Project key.");
+                return;
+            }
+
+            let randomKey = generateRandomKey();
+            document.getElementById(
+                "tokenDisplay"
+            ).textContent = `Authorization : ${randomKey}`;
+
+            const data = {
+                token: randomKey,
+            };
+            sessionStorage.setItem("projectData", JSON.stringify(data));
+
+            // Display data on the page
+            displayData(data);
+
+            // Send data to the server
+
+            fetch("/projectsubmit", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        projectKey: randomKey,
+                        projectName: projectName,
+                    }),
+                })
+                .then((response) => response.json())
+                .catch((err) => console.error("Error:", err));
+            document.querySelector('input[name="projectName"]').value = "";
+        }
+
+        function displayData(data) {
+            document.getElementById(
+                "tokenDisplay"
+            ).textContent = `Project Key : ${data.token}`;
+        }
+        window.onload = function() {
+            const storedData = sessionStorage.getItem("projectData");
+            if (storedData) {
+                const data = JSON.parse(storedData);
+                displayData(data);
+            }
         };
-        sessionStorage.setItem("projectData", JSON.stringify(data));
 
-        // Display data on the page
-        displayData(data);
+        function clearData() {
+            // Remove data from localStorage
+            sessionStorage.removeItem("projectData");
+            // Clear the displayed data
+            document.getElementById("tokenDisplay").textContent = "";
 
-        // Send data to the server
-
-        fetch("/projectsubmit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            projectKey: randomKey,
-            projectName: projectName,
-          }),
-        })
-          .then((response) => response.json())
-          .catch((err) => console.error("Error:", err));
-        document.querySelector('input[name="projectName"]').value = "";
-      }
-      function displayData(data) {
-        document.getElementById(
-          "tokenDisplay"
-        ).textContent = `Project Key : ${data.token}`;
-      }
-      window.onload = function () {
-        const storedData = sessionStorage.getItem("projectData");
-        if (storedData) {
-          const data = JSON.parse(storedData);
-          displayData(data);
+            document.querySelector('input[name="projectName"]').value = "";
+            localStorage.removeItem("authCheck");
         }
-      };
-      function clearData() {
-        // Remove data from localStorage
-        sessionStorage.removeItem("projectData");
-        // Clear the displayed data
-        document.getElementById("tokenDisplay").textContent = "";
-
-        document.querySelector('input[name="projectName"]').value = "";
-        localStorage.removeItem("authCheck");
-      }
     </script>
-  </body>
+</body>
+
 </html>
